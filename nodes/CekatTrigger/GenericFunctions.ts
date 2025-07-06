@@ -1,6 +1,6 @@
 import { IHttpRequestOptions, IExecuteFunctions, ITriggerFunctions } from 'n8n-workflow';
 
-const server_url = process.env.CEKAT_SERVER_URL;
+const server_url = 'https://api.cekat.ai'; // Default server URL, can be overridden by environment variable
 
 export async function cekatApiRequest(
 	this: IExecuteFunctions | ITriggerFunctions,
@@ -8,14 +8,15 @@ export async function cekatApiRequest(
 	endpoint: string,
 	body: any = {},
 	qs: any = {},
+	headers: any = {}, // tambahkan ini!
 ): Promise<any> {
 	const credentials = await this.getCredentials('CekatOpenApi');
 
 	const options: IHttpRequestOptions = {
 		method,
-		url: `${(server_url || 'http://localhost:3001') + endpoint}`,
+		url: `${server_url + endpoint}`,
 		headers: {
-			Authorization: `Bearer ${credentials.apiKey}`,
+			api_key: credentials.apiKey,
 		},
 		qs,
 		body,
