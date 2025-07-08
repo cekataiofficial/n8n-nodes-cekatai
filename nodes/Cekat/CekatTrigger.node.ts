@@ -3,6 +3,7 @@ import {
 	INodeType,
 	INodeTypeDescription,
 	IWebhookFunctions,
+	NodeConnectionTypes
 } from 'n8n-workflow';
 import { cekatApiRequest } from '../Cekat/GenericFunctions';
 import * as options from '../Cekat/methods';
@@ -19,7 +20,7 @@ export class CekatTrigger implements INodeType {
 			name: 'Cekat Trigger',
 		},
 		inputs: [],
-		outputs: ['main'],
+		outputs: [NodeConnectionTypes.Main],
 		credentials: [
 			{
 				name: 'CekatOpenApi',
@@ -31,7 +32,7 @@ export class CekatTrigger implements INodeType {
 				name: 'default',
 				httpMethod: 'POST',
 				responseMode: 'onReceived',
-				path: '',
+				path: 'webhook',
 			},
 		],
 		properties: [
