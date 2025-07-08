@@ -4,8 +4,8 @@ import {
 	INodeTypeDescription,
 	IWebhookFunctions,
 } from 'n8n-workflow';
-import { cekatApiRequest } from '../GenericFunctions';
-import * as options from '../methods';
+import { cekatApiRequest } from '../Cekat/GenericFunctions';
+import * as options from '../Cekat/methods';
 
 export class CekatTrigger implements INodeType {
 	description: INodeTypeDescription = {

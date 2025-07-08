@@ -1,11 +1,6 @@
-import {
-	IHttpRequestOptions,
-	IExecuteFunctions,
-	ITriggerFunctions,
-	IRequestOptions,
-} from 'n8n-workflow';
+import { IExecuteFunctions, IRequestOptions } from 'n8n-workflow';
 
-const server_url = process.env.CEKAT_SERVER_URL || 'http://localhost:3001';
+const server_url = 'https://server.cekat.ai';
 const api_url = 'https://api.cekat.ai';
 
 export async function cekatApiRequest(

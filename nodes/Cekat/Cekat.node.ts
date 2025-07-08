@@ -5,23 +5,24 @@ import {
 	INodeTypeDescription,
 } from 'n8n-workflow';
 
-import { cekatApiRequest } from '../GenericFunctions';
-import { messageFields, messageOperations } from './CekatDescription';
-import * as options from '../methods';
+import { cekatApiRequest } from './GenericFunctions';
+import { messageOperations, messageFields } from './description/MessageDescription';
+import { templateOperations, templateFields } from './description/TemplateDescription';
+import * as options from './methods';
 
-export class CekatSendMessage implements INodeType {
+export class Cekat implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'Cekat Send Message',
-		name: 'cekatSendMessage',
-		group: ['input'],
+		displayName: 'Cekat',
+		name: 'cekat',
+		group: ['transform'],
 		version: 1,
-		description: 'Send messages through Cekat API',
-		subtitle: '={{$parameter["resource"] + ": " + $parameter["operation"]}}',
+		description: 'Interact with Cekat API',
+		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
 		defaults: {
-			name: 'Cekat Send Message',
+			name: 'Cekat',
 		},
-		inputs: ['main' as any],
-		outputs: ['main' as any],
+		inputs: ['main'],
+		outputs: ['main'],
 		icon: 'file:cekat.svg',
 		credentials: [
 			{
@@ -33,12 +34,25 @@ export class CekatSendMessage implements INodeType {
 			{
 				displayName: 'Resource',
 				name: 'resource',
-				type: 'hidden',
+				type: 'options',
+				options: [
+					{ name: 'Message', value: 'message' },
+					{ name: 'Template', value: 'template' },
+				],
 				default: 'message',
 			},
 			...messageOperations,
 			...messageFields,
+			...templateOperations,
+			...templateFields,
 		],
+	};
+
+	methods = {
+		loadOptions: {
+			getInboxes: options.getInboxes,
+			getTemplates: options.getTemplates,
+		},
 	};
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
@@ -66,6 +80,7 @@ export class CekatSendMessage implements INodeType {
 						'POST',
 						'/messages/whatsapp',
 						body,
+						{},
 						'api',
 					);
 
@@ -84,6 +99,7 @@ export class CekatSendMessage implements INodeType {
 						'/templates',
 						{},
 						{ inbox_id: inboxId },
+
 						'api',
 					);
 					const selectedTemplate = templates.data.find((t: any) => t.id === templateId);
@@ -92,21 +108,30 @@ export class CekatSendMessage implements INodeType {
 					}
 
 					const whatsappTemplateId = selectedTemplate.wa_template_id;
-					const bodyVarsRaw = this.getNodeParameter('bodyVariables', i, []);
-					const bodyVarsArray = Array.isArray(bodyVarsRaw) ? bodyVarsRaw : [];
-					const bodyVariables = bodyVarsArray.map((v: any) => v.variable.value);
+					const bodyVarsRaw = this.getNodeParameter('bodyVariables', i, {}) as {
+						variable?: { value: string }[];
+					};
+					const bodyVariables = Array.isArray(bodyVarsRaw.variable)
+						? bodyVarsRaw.variable.map((v) => v.value)
+						: [];
 
-					const bodyVarDummy = ['Customer'];
 					const body = {
 						inbox_id: inboxId,
 						wa_template_id: whatsappTemplateId,
 						// "otp_code": "552345", //max 15 char for auth only
-						template_body_variables: bodyVarDummy,
+						template_body_variables: bodyVariables,
 						phone_number: receiverPhoneNumber,
 						phone_name: 'customer',
 					};
 
-					const response = await cekatApiRequest.call(this, 'POST', '/templates/send', body, 'api');
+					const response = await cekatApiRequest.call(
+						this,
+						'POST',
+						'/templates/send',
+						body,
+						{},
+						'api',
+					);
 
 					returnData.push({
 						json: response,
@@ -125,11 +150,4 @@ export class CekatSendMessage implements INodeType {
 
 		return [returnData];
 	}
-
-	methods = {
-		loadOptions: {
-			getInboxes: options.getInboxes,
-			getTemplates: options.getTemplates,
-		},
-	};
 }
