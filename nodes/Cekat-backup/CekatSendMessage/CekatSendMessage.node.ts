@@ -61,13 +61,7 @@ export class CekatSendMessage implements INodeType {
 						message: text,
 					};
 
-					const response = await cekatApiRequest.call(
-						this,
-						'POST',
-						'/messages/whatsapp',
-						body,
-						'api',
-					);
+					const response = await cekatApiRequest.call(this, 'POST', '/messages/whatsapp', body);
 
 					returnData.push({
 						json: response,
@@ -84,7 +78,6 @@ export class CekatSendMessage implements INodeType {
 						'/templates',
 						{},
 						{ inbox_id: inboxId },
-						'api',
 					);
 					const selectedTemplate = templates.data.find((t: any) => t.id === templateId);
 					if (!selectedTemplate) {
@@ -106,7 +99,7 @@ export class CekatSendMessage implements INodeType {
 						phone_name: 'customer',
 					};
 
-					const response = await cekatApiRequest.call(this, 'POST', '/templates/send', body, 'api');
+					const response = await cekatApiRequest.call(this, 'POST', '/templates/send', body);
 
 					returnData.push({
 						json: response,

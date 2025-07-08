@@ -5,8 +5,7 @@ import {
 	IRequestOptions,
 } from 'n8n-workflow';
 
-const server_url = process.env.CEKAT_SERVER_URL || 'http://localhost:3001';
-const api_url = 'https://api.cekat.ai';
+const server_url = 'https://api.cekat.ai'; // Default server URL, can be overridden by credentials
 
 export async function cekatApiRequest(
 	this: IExecuteFunctions,
@@ -14,7 +13,6 @@ export async function cekatApiRequest(
 	endpoint: string,
 	body?: any,
 	qs?: any,
-	urlType: 'server' | 'api' = 'server',
 ): Promise<any> {
 	const credentials = await this.getCredentials('CekatOpenApi');
 	const options = {
@@ -22,10 +20,9 @@ export async function cekatApiRequest(
 		body,
 		qs,
 		headers: {
-			Authorization: `Bearer ${credentials.apiKey}`,
 			api_key: credentials.apiKey,
 		},
-		uri: `${urlType === 'server' ? server_url + endpoint : api_url + endpoint}`,
+		uri: `${server_url}${endpoint}`,
 		json: true,
 	} as IRequestOptions;
 	return this.helpers.request(options);

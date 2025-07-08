@@ -36,8 +36,8 @@
       "dist/credentials/CekatOpenApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/CekatTrigger/CekatTrigger.node.js",
-      "dist/nodes/Cekat/CekatSendMessage.node.js"
+      "dist/nodes/Cekat/CekatTrigger/CekatTrigger.node.js",
+      "dist/nodes/Cekat/CekatSendMessage/CekatSendMessage.node.js"
     ]
   },
   "devDependencies": {
