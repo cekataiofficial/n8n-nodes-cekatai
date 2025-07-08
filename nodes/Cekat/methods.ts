@@ -31,6 +31,34 @@ export async function getInboxes(this: ILoadOptionsFunctions): Promise<INodeProp
 	);
 }
 
+export async function loadTemplateVariables(
+	this: ILoadOptionsFunctions,
+): Promise<INodePropertyOptions[]> {
+	const credentials = await this.getCredentials('CekatOpenApi');
+	if (!credentials || !credentials.apiKey) {
+		throw new Error('No Cekat API Key credentials found!');
+	}
+	const apiKey = credentials.apiKey as string;
+
+	// Dapetin inboxId yang user pilih di UI node n8n
+	const inboxId = this.getNodeParameter('inboxId') as string;
+
+	// Panggil API pakai inboxId
+	const data = await cekatApiRequest.call(
+		this,
+		'GET',
+		'/templates',
+		{ inbox_id: inboxId },
+		{ api_key: apiKey },
+		'api',
+	);
+
+	return data.data.map((template: { id: string; name: string }) => ({
+		name: template.name,
+		value: template.id,
+	}));
+}
+
 export async function getTemplates(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 	const credentials = await this.getCredentials('CekatOpenApi');
 	if (!credentials || !credentials.apiKey) {
@@ -46,7 +74,6 @@ export async function getTemplates(this: ILoadOptionsFunctions): Promise<INodePr
 		this,
 		'GET',
 		'/templates',
-		{},
 		{ inbox_id: inboxId },
 		{ api_key: apiKey },
 		'api',

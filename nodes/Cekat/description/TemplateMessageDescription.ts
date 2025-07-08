@@ -73,35 +73,39 @@ export const templateFields: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Body Variables',
-		name: 'bodyVariables',
-		placeholder: 'Add Variable',
-		type: 'fixedCollection',
-		typeOptions: { multipleValues: true },
-		default: [],
+		displayName: 'Receiver Name',
+		name: 'receiverName',
+		type: 'string',
+		default: '',
+		required: true,
+		description: 'The name of the receiver to be used in the template',
 		displayOptions: {
 			show: {
 				resource: ['message'],
 				operation: ['sendTemplateMessage'],
 			},
 		},
+	},
+	{
+		displayName: 'Body Variables',
+		name: 'bodyVariables',
+		type: 'fixedCollection',
+		typeOptions: {
+			multipleValues: true,
+		},
+		default: [],
 		options: [
 			{
-				displayName: 'Variable',
+				displayName: 'Variables',
 				name: 'variable',
-				values: [
-					{
-						displayName: 'Variable Value (e.g., Name)',
-						name: 'value',
-						type: 'string',
-						default: '',
-						description:
-							'Value of this variable. Order matters: first variable is {{1}} in your template.',
-					},
-				],
+				values: [], // Kosong, kita inject nanti lewat `loadOptionsMethod`
 			},
 		],
-		description:
-			'Add template body variables. Order is important: Variable 1 -> {{1}}, Variable 2 -> {{2}}, etc.',
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: ['sendTemplateMessage'],
+			},
+		},
 	},
 ];

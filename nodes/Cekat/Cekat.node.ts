@@ -7,7 +7,7 @@ import {
 
 import { cekatApiRequest } from './GenericFunctions';
 import { messageOperations, messageFields } from './description/MessageDescription';
-import { templateOperations, templateFields } from './description/TemplateDescription';
+import { templateOperations, templateFields } from './description/TemplateMessageDescription';
 import * as options from './methods';
 
 export class Cekat implements INodeType {
@@ -89,8 +89,10 @@ export class Cekat implements INodeType {
 					});
 				} else if (resource === 'message' && operation === 'sendTemplateMessage') {
 					const inboxId = this.getNodeParameter('inboxId', i) as string;
+					const receiverName = this.getNodeParameter('receiverName', i) as string;
 					const receiverPhoneNumber = this.getNodeParameter('receiverPhoneNumber', i) as string;
 
+					console.log(receiverName);
 					const templateId = this.getNodeParameter('templateId', i);
 
 					const templates = await cekatApiRequest.call(
@@ -121,7 +123,7 @@ export class Cekat implements INodeType {
 						// "otp_code": "552345", //max 15 char for auth only
 						template_body_variables: bodyVariables,
 						phone_number: receiverPhoneNumber,
-						phone_name: 'customer',
+						phone_name: receiverName,
 					};
 
 					const response = await cekatApiRequest.call(
