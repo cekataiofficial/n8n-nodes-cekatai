@@ -54,7 +54,13 @@ export const conversationFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['conversation'],
-				operation: ['resolveConversation', 'assignLabel', 'assignAgent', 'addCollaborator'],
+				operation: [
+					'resolveConversation',
+					'assignLabel',
+					'assignAgent',
+					'addCollaborator',
+					'changeStageStatus',
+				],
 			},
 		},
 	},
