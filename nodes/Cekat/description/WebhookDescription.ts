@@ -15,12 +15,12 @@ export const webhookOperation: INodeProperties[] = [
 			{
 				name: 'Subscribe to webhook',
 				value: 'subscribe',
-				action: 'subscribe to a webhook',
+				action: 'Subscribe to a webhook',
 			},
 			{
 				name: 'Unsubscribe to webhook',
 				value: 'unsubscribe',
-				action: 'unsubscribe from a webhook',
+				action: 'Unsubscribe from a webhook',
 			},
 		],
 		default: 'subscribe',
