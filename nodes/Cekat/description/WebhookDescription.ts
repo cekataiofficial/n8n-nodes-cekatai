@@ -43,18 +43,20 @@ export const webhookFields: INodeProperties[] = [
 		},
 	},
 
-	// Only show Inbox ID when subscribing
 	{
-		displayName: 'Inbox ID',
+		displayName: 'Select Inbox or Inbox ID',
 		name: 'inboxId',
-		type: 'string',
+		type: 'options',
+		typeOptions: {
+			loadOptionsMethod: 'getInboxesDropdown',
+		},
 		default: '',
 		required: true,
-		description: 'ID of the inbox this webhook is related to',
+		description: 'Select the inbox to subscribe to webhook events',
 		displayOptions: {
 			show: {
 				resource: ['webhook'],
-				operation: ['subscribe'], // 👈 hanya muncul saat subscribe
+				operation: ['subscribe'],
 			},
 		},
 	},

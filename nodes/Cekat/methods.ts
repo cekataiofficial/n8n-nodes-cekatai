@@ -139,3 +139,21 @@ export async function getPipelinesDropdown(
 		color: pipelines.color,
 	}));
 }
+
+export async function getInboxesDropdown(
+	this: ILoadOptionsFunctions,
+): Promise<INodePropertyOptions[]> {
+	const res = await cekatApiRequest.call(
+		this,
+		'GET',
+		'/business_workflows/inboxes',
+		{},
+		{},
+		'server',
+	);
+
+	return res.map((inbox: { id: string; name: string }) => ({
+		name: inbox.name,
+		value: inbox.id,
+	}));
+}

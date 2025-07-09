@@ -79,6 +79,7 @@ export class Cekat implements INodeType {
 			getAgentsDropdown: options.getAgentsDropdown,
 			getLabelsDropdown: options.getLabelsDropdown,
 			getPipelinesDropdown: options.getPipelinesDropdown,
+			getInboxesDropdown: options.getInboxesDropdown,
 		},
 	};
 
