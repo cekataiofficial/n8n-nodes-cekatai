@@ -48,7 +48,6 @@ export class Cekat implements INodeType {
 					{ name: 'Pipeline', value: 'pipeline' },
 					{ name: 'Conversation', value: 'conversation' },
 					{ name: 'Message', value: 'message' },
-					{ name: 'Template', value: 'template' },
 				],
 				default: [],
 			},
