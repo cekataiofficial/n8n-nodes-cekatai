@@ -6,9 +6,14 @@ import {
 } from 'n8n-workflow';
 
 import { cekatApiRequest } from './GenericFunctions';
-import { messageOperations, messageFields } from './description/MessageDescription';
-import { templateOperations, templateFields } from './description/TemplateMessageDescription';
+import { messageOperations, messageFields, templateFields } from './description/MessageDescription';
+
 import * as options from './methods';
+import { conversationOperation } from './description/ConversationDescription';
+import { lookupFields, lookupOperation } from './description/LookupDescription';
+import { contactOperation } from './description/ContactDescription';
+import { webhookOperation } from './description/WebhookDescription';
+import { pipelineOperation } from './description/PipelineDescription';
 
 export class Cekat implements INodeType {
 	description: INodeTypeDescription = {
@@ -21,8 +26,8 @@ export class Cekat implements INodeType {
 		defaults: {
 			name: 'Cekat',
 		},
-		inputs: ['main'],
-		outputs: ['main'],
+		inputs: ['main' as any],
+		outputs: ['main' as any],
 		icon: 'file:cekat.svg',
 		credentials: [
 			{
@@ -36,14 +41,35 @@ export class Cekat implements INodeType {
 				name: 'resource',
 				type: 'options',
 				options: [
+					{ name: 'Lookup', value: 'lookup' },
+					{ name: 'Contact', value: 'contact' },
+					{ name: 'Webhook', value: 'webhook' },
+					{ name: 'Pipeline', value: 'pipeline' },
+					{ name: 'Conversation', value: 'conversation' },
 					{ name: 'Message', value: 'message' },
 					{ name: 'Template', value: 'template' },
 				],
 				default: 'message',
 			},
+
+			//lookup operations && fields
+			...lookupOperation,
+			...lookupFields,
+			//contact operations && fields
+			...contactOperation,
+
+			//webhook operations && fields
+			...webhookOperation,
+
+			//pipeline operations && fields
+			...pipelineOperation,
+
+			//conversation operations && fields
+			...conversationOperation,
+
+			//message operations && fields
 			...messageOperations,
 			...messageFields,
-			...templateOperations,
 			...templateFields,
 		],
 	};
@@ -52,6 +78,7 @@ export class Cekat implements INodeType {
 		loadOptions: {
 			getInboxes: options.getInboxes,
 			getTemplates: options.getTemplates,
+			getTemplatePreview: options.getTemplatePreview,
 		},
 	};
 
