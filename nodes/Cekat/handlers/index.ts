@@ -4,13 +4,13 @@ import { handleSendMessage } from './message/sendMessage';
 import { handleSendTemplateMessage } from './message/sendTemplateMessage';
 import { handleAddAdditionalData } from './contact/addAdditionalData';
 import { handleSubscribeWebhook } from './webhook/subscribe';
-import { handleSetPipelineStatus } from './pipeline/setStatusPipeline';
+import { handleSetPipelineStatus } from './conversation/assignPipeline';
 
-import { handleAssignLabel } from './conversation/AssignLabel';
-import { handleAssignAgent } from './conversation/AssignAgent';
+import { handleAssignLabel } from './conversation/assignLabel';
+import { handleAssignAgent } from './conversation/assignAgent';
 import { handleAddCollaborator } from './conversation/addCollaborator';
 import { handleChangeStageStatus } from './conversation/changeStageStatus';
-import { handleResolveConversation } from './conversation/Resolve';
+import { handleResolveConversation } from './conversation/resolve';
 
 export const handlers: Record<
 	string,
@@ -24,8 +24,7 @@ export const handlers: Record<
 	'webhook:subscribe': handleSubscribeWebhook,
 	'webhook:unsubscribe': handleSubscribeWebhook,
 
-	'pipeline:setPipelineStatus': handleSetPipelineStatus,
-
+	'conversation:setPipelineStatus': handleSetPipelineStatus,
 	'conversation:resolveConversation': handleResolveConversation,
 	'conversation:assignLabel': handleAssignLabel,
 	'conversation:assignAgent': handleAssignAgent,

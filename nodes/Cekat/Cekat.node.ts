@@ -13,7 +13,6 @@ import { conversationFields, conversationOperation } from './description/Convers
 import { lookupFields, lookupOperation } from './description/LookupDescription';
 import { contactFields, contactOperation } from './description/ContactDescription';
 import { webhookFields, webhookOperation } from './description/WebhookDescription';
-import { pipelineFields, pipelineOperation } from './description/PipelineDescription';
 import { handlers } from './handlers';
 
 export class Cekat implements INodeType {
@@ -45,7 +44,6 @@ export class Cekat implements INodeType {
 					{ name: 'Lookup', value: 'lookup' },
 					{ name: 'Contact', value: 'contact' },
 					{ name: 'Webhook', value: 'webhook' },
-					{ name: 'Pipeline', value: 'pipeline' },
 					{ name: 'Conversation', value: 'conversation' },
 					{ name: 'Message', value: 'message' },
 				],
@@ -63,10 +61,6 @@ export class Cekat implements INodeType {
 			...webhookOperation,
 			...webhookFields,
 
-			//pipeline operations && fields
-			...pipelineOperation,
-			...pipelineFields,
-
 			//conversation operations && fields
 			...conversationOperation,
 			...conversationFields,
@@ -82,6 +76,9 @@ export class Cekat implements INodeType {
 		loadOptions: {
 			getInboxes: options.getInboxes,
 			getTemplates: options.getTemplates,
+			getAgentsDropdown: options.getAgentsDropdown,
+			getLabelsDropdown: options.getLabelsDropdown,
+			getPipelinesDropdown: options.getPipelinesDropdown,
 		},
 	};
 

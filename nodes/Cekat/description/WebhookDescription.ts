@@ -42,6 +42,8 @@ export const webhookFields: INodeProperties[] = [
 			},
 		},
 	},
+
+	// Only show Inbox ID when subscribing
 	{
 		displayName: 'Inbox ID',
 		name: 'inboxId',
@@ -52,10 +54,12 @@ export const webhookFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['webhook'],
-				operation: ['subscribe', 'unsubscribe'],
+				operation: ['subscribe'], // 👈 hanya muncul saat subscribe
 			},
 		},
 	},
+
+	// Only show events when subscribing
 	{
 		displayName: 'Events',
 		name: 'events',
@@ -72,11 +76,11 @@ export const webhookFields: INodeProperties[] = [
 		],
 		default: [],
 		required: true,
-		description: 'Select one or more events to subscribe/unsubscribe',
+		description: 'Select one or more events to subscribe',
 		displayOptions: {
 			show: {
 				resource: ['webhook'],
-				operation: ['subscribe', 'unsubscribe'],
+				operation: ['subscribe'], // 👈 hanya muncul saat subscribe
 			},
 		},
 	},

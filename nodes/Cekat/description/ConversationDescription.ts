@@ -37,6 +37,11 @@ export const conversationOperation: INodeProperties[] = [
 				value: 'changeStageStatus',
 				action: 'Change the stage status of a conversation',
 			},
+			{
+				name: 'Set Pipeline Status',
+				value: 'setPipelineStatus',
+				action: 'Set the status of a pipeline',
+			},
 		],
 		default: 'assignAgent',
 	},
@@ -44,6 +49,96 @@ export const conversationOperation: INodeProperties[] = [
 
 export const conversationFields: INodeProperties[] = [
 	// 📌 Digunakan oleh SEMUA operation
+
+	// 📌 assignAgent & addCollaborator
+	{
+		displayName: 'Select Agent or Agent ID',
+		name: 'agentId',
+		type: 'options',
+		typeOptions: {
+			loadOptionsMethod: 'getAgentsDropdown',
+		},
+		default: '',
+		required: true,
+		description: 'choose of the agent to assign or add as collaborator',
+		displayOptions: {
+			show: {
+				resource: ['conversation'],
+				operation: ['assignAgent', 'addCollaborator'],
+			},
+		},
+	},
+
+	// 📌 assignLabel only
+	{
+		displayName: 'Select Label or Label ID',
+		name: 'labelId',
+
+		type: 'options',
+		default: '',
+		required: true,
+		typeOptions: {
+			loadOptionsMethod: 'getLabelsDropdown',
+		},
+		description: 'choose of the Label to assign',
+		displayOptions: {
+			show: {
+				resource: ['conversation'],
+				operation: ['assignLabel'],
+			},
+		},
+	},
+	{
+		displayName: 'Stage Status',
+		name: 'stage_status',
+		type: 'options',
+		options: [
+			{ name: 'Assigned', value: 'assigned' },
+			{ name: 'Pending', value: 'pending' },
+			{ name: 'Open', value: 'open' },
+			{ name: 'Resolved', value: 'resolved' },
+		],
+		default: 'assigned',
+		required: true,
+		description: 'The stage status to change the conversation to',
+		displayOptions: {
+			show: {
+				resource: ['conversation'],
+				operation: ['changeStageStatus'],
+			},
+		},
+	},
+	{
+		displayName: 'Select Pipeline or Pipeline ID',
+		name: 'pipelineStatusId',
+		type: 'options',
+		typeOptions: {
+			loadOptionsMethod: 'getPipelinesDropdown',
+		},
+		default: '',
+		required: true,
+		description: 'The ID of the pipeline status to be set',
+		displayOptions: {
+			show: {
+				resource: ['conversation'],
+				operation: ['setPipelineStatus'],
+			},
+		},
+	},
+	{
+		displayName: 'Conversation ID',
+		name: 'conversationId',
+		type: 'string',
+		default: '',
+		required: true,
+		description: 'The ID of the conversation to apply the pipeline status to',
+		displayOptions: {
+			show: {
+				resource: ['conversation'],
+				operation: ['setPipelineStatus'],
+			},
+		},
+	},
 	{
 		displayName: 'Conversation ID',
 		name: 'conversationId',
@@ -61,52 +156,6 @@ export const conversationFields: INodeProperties[] = [
 					'addCollaborator',
 					'changeStageStatus',
 				],
-			},
-		},
-	},
-
-	// 📌 assignAgent & addCollaborator
-	{
-		displayName: 'Agent ID',
-		name: 'agentId',
-		type: 'string',
-		default: '',
-		required: true,
-		description: 'ID of the agent',
-		displayOptions: {
-			show: {
-				resource: ['conversation'],
-				operation: ['assignAgent', 'addCollaborator'],
-			},
-		},
-	},
-
-	// 📌 assignLabel only
-	{
-		displayName: 'Label ID',
-		name: 'labelId',
-		type: 'string',
-		default: '',
-		required: true,
-		description: 'ID of the label',
-		displayOptions: {
-			show: {
-				resource: ['conversation'],
-				operation: ['assignLabel'],
-			},
-		},
-	},
-	{
-		displayName: 'Stage Status',
-		name: 'stage_status',
-		type: 'string',
-		default: '',
-		required: true,
-		description: 'The stage status to change the conversation to',
-		displayOptions: {
-			show: {
-				resource: ['conversation'],
-				operation: ['changeStageStatus'],
 			},
 		},
 	},

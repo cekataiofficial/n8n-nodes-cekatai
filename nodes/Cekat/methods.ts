@@ -84,3 +84,58 @@ export async function getTemplates(this: ILoadOptionsFunctions): Promise<INodePr
 		value: template.id,
 	}));
 }
+
+export async function getAgentsDropdown(
+	this: ILoadOptionsFunctions,
+): Promise<INodePropertyOptions[]> {
+	const res = await cekatApiRequest.call(
+		this,
+		'GET',
+		'/business_workflows/agents',
+		{},
+		{},
+		'server',
+	);
+
+	return res.map((agent: { id: string; name: string }) => ({
+		name: agent.name,
+		value: agent.id,
+	}));
+}
+
+export async function getLabelsDropdown(
+	this: ILoadOptionsFunctions,
+): Promise<INodePropertyOptions[]> {
+	const res = await cekatApiRequest.call(
+		this,
+		'GET',
+		'/business_workflows/labels',
+		{},
+		{},
+		'server',
+	);
+
+	return res.map((labels: { id: string; name: string }) => ({
+		name: labels.name,
+		value: labels.id,
+	}));
+}
+
+export async function getPipelinesDropdown(
+	this: ILoadOptionsFunctions,
+): Promise<INodePropertyOptions[]> {
+	const res = await cekatApiRequest.call(
+		this,
+		'GET',
+		'/business_workflows/labels',
+		{},
+		{},
+		'server',
+	);
+
+	return res.map((pipelines: { id: string; name: string; color: string }) => ({
+		name: pipelines.name,
+		value: pipelines.id,
+		color: pipelines.color,
+	}));
+}
