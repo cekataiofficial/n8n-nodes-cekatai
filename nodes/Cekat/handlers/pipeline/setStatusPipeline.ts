@@ -1,27 +1,25 @@
 import type { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
 import { cekatApiRequest } from '../../GenericFunctions';
 
-export async function handleSendMessage(
+export async function handleSetPipelineStatus(
 	context: IExecuteFunctions,
 	i: number,
 ): Promise<INodeExecutionData> {
+	const pipelineStatusId = context.getNodeParameter('pipelineStatusId', i) as string;
 	const conversationId = context.getNodeParameter('conversationId', i) as string;
-	const receiverPhoneNumber = context.getNodeParameter('receiverPhoneNumber', i) as string;
-	const text = context.getNodeParameter('text', i) as string;
 
 	const body = {
+		pipeline_status_id: pipelineStatusId,
 		conversation_id: conversationId,
-		receiver: receiverPhoneNumber,
-		message: text,
 	};
 
 	const response = await cekatApiRequest.call(
 		context,
 		'POST',
-		'/messages/whatsapp',
+		'/business_workflows/pipeline-status/update',
 		body,
 		{},
-		'api',
+		'server',
 	);
 
 	return {

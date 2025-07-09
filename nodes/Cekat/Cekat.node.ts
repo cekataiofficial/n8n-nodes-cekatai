@@ -9,11 +9,12 @@ import { cekatApiRequest } from './GenericFunctions';
 import { messageOperations, messageFields, templateFields } from './description/MessageDescription';
 
 import * as options from './methods';
-import { conversationOperation } from './description/ConversationDescription';
+import { conversationFields, conversationOperation } from './description/ConversationDescription';
 import { lookupFields, lookupOperation } from './description/LookupDescription';
-import { contactOperation } from './description/ContactDescription';
-import { webhookOperation } from './description/WebhookDescription';
-import { pipelineOperation } from './description/PipelineDescription';
+import { contactFields, contactOperation } from './description/ContactDescription';
+import { webhookFields, webhookOperation } from './description/WebhookDescription';
+import { pipelineFields, pipelineOperation } from './description/PipelineDescription';
+import { handlers } from './handlers';
 
 export class Cekat implements INodeType {
 	description: INodeTypeDescription = {
@@ -49,7 +50,7 @@ export class Cekat implements INodeType {
 					{ name: 'Message', value: 'message' },
 					{ name: 'Template', value: 'template' },
 				],
-				default: 'message',
+				default: [],
 			},
 
 			//lookup operations && fields
@@ -57,15 +58,19 @@ export class Cekat implements INodeType {
 			...lookupFields,
 			//contact operations && fields
 			...contactOperation,
+			...contactFields,
 
 			//webhook operations && fields
 			...webhookOperation,
+			...webhookFields,
 
 			//pipeline operations && fields
 			...pipelineOperation,
+			...pipelineFields,
 
 			//conversation operations && fields
 			...conversationOperation,
+			...conversationFields,
 
 			//message operations && fields
 			...messageOperations,
@@ -78,7 +83,6 @@ export class Cekat implements INodeType {
 		loadOptions: {
 			getInboxes: options.getInboxes,
 			getTemplates: options.getTemplates,
-			getTemplatePreview: options.getTemplatePreview,
 		},
 	};
 
@@ -90,84 +94,16 @@ export class Cekat implements INodeType {
 			try {
 				const resource = this.getNodeParameter('resource', i) as string;
 				const operation = this.getNodeParameter('operation', i) as string;
+				const key = `${resource}:${operation}`;
 
-				if (resource === 'message' && operation === 'sendMessage') {
-					const conversationId = this.getNodeParameter('conversationId', i) as string;
-					const receiverPhoneNumber = this.getNodeParameter('receiverPhoneNumber', i) as string;
-					const text = this.getNodeParameter('text', i) as string;
+				const handler = handlers[key];
 
-					const body = {
-						conversation_id: conversationId,
-						receiver: receiverPhoneNumber,
-						message: text,
-					};
-
-					const response = await cekatApiRequest.call(
-						this,
-						'POST',
-						'/messages/whatsapp',
-						body,
-						{},
-						'api',
-					);
-
-					returnData.push({
-						json: response,
-					});
-				} else if (resource === 'message' && operation === 'sendTemplateMessage') {
-					const inboxId = this.getNodeParameter('inboxId', i) as string;
-					const receiverName = this.getNodeParameter('receiverName', i) as string;
-					const receiverPhoneNumber = this.getNodeParameter('receiverPhoneNumber', i) as string;
-
-					console.log(receiverName);
-					const templateId = this.getNodeParameter('templateId', i);
-
-					const templates = await cekatApiRequest.call(
-						this,
-						'GET',
-						'/templates',
-						{},
-						{ inbox_id: inboxId },
-
-						'api',
-					);
-					const selectedTemplate = templates.data.find((t: any) => t.id === templateId);
-					if (!selectedTemplate) {
-						throw new Error(`Template with ID ${templateId} not found in inbox ${inboxId}`);
-					}
-
-					const whatsappTemplateId = selectedTemplate.wa_template_id;
-					const bodyVarsRaw = this.getNodeParameter('bodyVariables', i, {}) as {
-						variable?: { value: string }[];
-					};
-					const bodyVariables = Array.isArray(bodyVarsRaw.variable)
-						? bodyVarsRaw.variable.map((v) => v.value)
-						: [];
-
-					const body = {
-						inbox_id: inboxId,
-						wa_template_id: whatsappTemplateId,
-						// "otp_code": "552345", //max 15 char for auth only
-						template_body_variables: bodyVariables,
-						phone_number: receiverPhoneNumber,
-						phone_name: receiverName,
-					};
-
-					const response = await cekatApiRequest.call(
-						this,
-						'POST',
-						'/templates/send',
-						body,
-						{},
-						'api',
-					);
-
-					returnData.push({
-						json: response,
-					});
-				} else {
-					throw new Error(`Unsupported resource (${resource}) or operation (${operation})`);
+				if (!handler) {
+					throw new Error(`No handler registered for resource:operation "${key}"`);
 				}
+
+				const result = await handler(this, i);
+				returnData.push(result);
 			} catch (error) {
 				if (this.continueOnFail()) {
 					returnData.push({ json: { error: (error as Error).message }, pairedItem: i });

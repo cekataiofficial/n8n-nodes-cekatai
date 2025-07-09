@@ -6,18 +6,23 @@ export async function handleLookup(
 ): Promise<INodeExecutionData> {
 	const operation = context.getNodeParameter('operation', i) as string;
 
+	console.log(`Executing lookup operation: ${operation}`);
+
 	switch (operation) {
 		case 'getMessages': {
 			const conversationId = context.getNodeParameter('conversationId', i) as string;
 			const res = await cekatApiRequest.call(
 				context,
 				'GET',
-				`/conversations/${conversationId}/messages`,
+				`/business_workflows/conversation-messages`,
+				{},
+				{ conversation_id: conversationId },
+				'server',
 			);
 			return { json: res };
 		}
 
-		case 'getTemplates': {
+		case 'getAllTemplates': {
 			const inboxId = context.getNodeParameter('inboxId', i) as string;
 			const res = await cekatApiRequest.call(
 				context,
@@ -25,24 +30,68 @@ export async function handleLookup(
 				'/templates',
 				{},
 				{ inbox_id: inboxId },
+				'api',
 			);
 			return { json: res };
 		}
 
-		case 'getLabels':
-		case 'getInboxes':
-		case 'getAgents':
-		case 'getPipelineStatuses':
-		case 'getSubscribedWebhooks': {
-			const pathMap: Record<string, string> = {
-				getLabels: '/labels',
-				getInboxes: '/inboxes',
-				getAgents: '/agents',
-				getPipelineStatuses: '/pipeline-statuses',
-				getSubscribedWebhooks: '/webhooks/subscribed',
-			};
+		case 'getLabels': {
+			const res = await cekatApiRequest.call(
+				context,
+				'GET',
+				'/business_workflows/labels',
+				{},
+				{},
+				'server',
+			);
+			return { json: res };
+		}
 
-			const res = await cekatApiRequest.call(context, 'GET', pathMap[operation]);
+		case 'getInboxes': {
+			const res = await cekatApiRequest.call(
+				context,
+				'GET',
+				'/business_workflows/inboxes',
+				{},
+				{},
+				'server',
+			);
+			return { json: res };
+		}
+
+		case 'getAgents': {
+			const res = await cekatApiRequest.call(
+				context,
+				'GET',
+				'/business_workflows/agents',
+				{},
+				{},
+				'server',
+			);
+			return { json: res };
+		}
+
+		case 'getPipelineStatuses': {
+			const res = await cekatApiRequest.call(
+				context,
+				'GET',
+				'/business_workflows/pipeline-status',
+				{},
+				{},
+				'server',
+			);
+			return { json: res };
+		}
+
+		case 'getSubscribedWebhooks': {
+			const res = await cekatApiRequest.call(
+				context,
+				'GET',
+				'/business_workflows/webhooks/subscribed',
+				{},
+				{},
+				'server',
+			);
 			return { json: res };
 		}
 

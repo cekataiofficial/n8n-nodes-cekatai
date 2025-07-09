@@ -44,7 +44,7 @@ export const lookupOperation: INodeProperties[] = [
 			},
 			{
 				name: 'Get Templates',
-				value: 'getAll',
+				value: 'getAllTemplates',
 				action: 'Get all templates',
 			},
 		],
@@ -91,5 +91,22 @@ export const lookupFields: INodeProperties[] = [
 			},
 		},
 		description: 'The type of inbox to filter by (e.g., "email", "whatsapp")',
+	},
+	{
+		displayName: 'Inbox Name',
+		name: 'inboxId',
+		type: 'options',
+		typeOptions: {
+			loadOptionsMethod: 'getInboxes',
+		},
+		default: '',
+		required: true,
+		description: 'Choose an inbox to send the template message from',
+		displayOptions: {
+			show: {
+				resource: ['lookup'],
+				operation: ['getAllTemplates'],
+			},
+		},
 	},
 ];

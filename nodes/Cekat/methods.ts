@@ -1,4 +1,4 @@
-import { IExecuteFunctions, ILoadOptionsFunctions, INodePropertyOptions } from 'n8n-workflow';
+import { ILoadOptionsFunctions, INodePropertyOptions } from 'n8n-workflow';
 import { cekatApiRequest } from './GenericFunctions';
 
 export async function getInboxes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {

@@ -21,3 +21,54 @@ export const contactOperation: INodeProperties[] = [
 		default: 'updateAdditionalData',
 	},
 ];
+
+export const contactFields: INodeProperties[] = [
+	{
+		displayName: 'Contact ID',
+		name: 'contactId',
+		type: 'string',
+		default: '',
+		required: true,
+		description: 'The ID of the contact whose additional data will be updated',
+		displayOptions: {
+			show: {
+				resource: ['contact'],
+				operation: ['updateAdditionalData'],
+			},
+		},
+	},
+	{
+		displayName: 'Additional Data',
+		name: 'additionalData',
+		type: 'fixedCollection',
+		placeholder: 'Add Field',
+		typeOptions: {
+			multipleValues: true,
+		},
+		default: {},
+		options: [
+			{
+				displayName: 'Data',
+				name: 'data',
+				values: [
+					{
+						displayName: 'Data Value (e.g., Name)',
+						name: 'value',
+						type: 'string',
+						default: '',
+						description:
+							"The value to update in the contact's additional data. This can be a string or a number.",
+					},
+				],
+			},
+		],
+		required: true,
+		description: "Key-value pairs to update in the contact's additional data",
+		displayOptions: {
+			show: {
+				resource: ['contact'],
+				operation: ['updateAdditionalData'],
+			},
+		},
+	},
+];

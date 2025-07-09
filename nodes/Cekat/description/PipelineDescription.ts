@@ -21,3 +21,34 @@ export const pipelineOperation: INodeProperties[] = [
 		default: 'setPipelineStatus',
 	},
 ];
+
+export const pipelineFields: INodeProperties[] = [
+	{
+		displayName: 'Pipeline Status ID',
+		name: 'pipelineStatusId',
+		type: 'string',
+		default: '',
+		required: true,
+		description: 'The ID of the pipeline status to be set',
+		displayOptions: {
+			show: {
+				resource: ['pipeline'],
+				operation: ['setPipelineStatus'],
+			},
+		},
+	},
+	{
+		displayName: 'Conversation ID',
+		name: 'conversationId',
+		type: 'string',
+		default: '',
+		required: true,
+		description: 'The ID of the conversation to apply the pipeline status to',
+		displayOptions: {
+			show: {
+				resource: ['pipeline'],
+				operation: ['setPipelineStatus'],
+			},
+		},
+	},
+];

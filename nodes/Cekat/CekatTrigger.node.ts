@@ -3,7 +3,6 @@ import {
 	INodeType,
 	INodeTypeDescription,
 	IWebhookFunctions,
-	NodeConnectionTypes
 } from 'n8n-workflow';
 import { cekatApiRequest } from '../Cekat/GenericFunctions';
 import * as options from '../Cekat/methods';
@@ -20,7 +19,7 @@ export class CekatTrigger implements INodeType {
 			name: 'Cekat Trigger',
 		},
 		inputs: [],
-		outputs: [NodeConnectionTypes.Main],
+		outputs: ['main' as any],
 		credentials: [
 			{
 				name: 'CekatOpenApi',
@@ -69,65 +68,49 @@ export class CekatTrigger implements INodeType {
 
 	webhookMethods = {
 		default: {
-			async checkExists(this: ITriggerFunctions) {
-				// Optionally implement deduplication logic here
+			async checkExists(this: ITriggerFunctions): Promise<boolean> {
 				const webhookUrl = this.getNodeWebhookUrl('default');
 				const events = this.getNodeParameter('events') as string[];
-				const inboxId = this.getNodeParameter('inbox_id') as string;
+				const inboxId = this.getNodeParameter('inbox_id', '') as string;
 
-				const response = await cekatApiRequest.call(
+				const res = await cekatApiRequest.call(
 					this,
 					'GET',
 					'/business_workflows/webhooks',
 					{},
-					{
-						webhookUrl,
-						inboxId,
-					},
+					{ webhookUrl, inboxId },
 					'server',
 				);
 
-				if (response.length > 0) {
-					return true;
-				}
-
-				return false;
+				return Array.isArray(res) && res.length > 0;
 			},
 
-			async create(this: ITriggerFunctions) {
+			async create(this: ITriggerFunctions): Promise<boolean> {
 				const events = this.getNodeParameter('events') as string[];
 				const webhookUrl = this.getNodeWebhookUrl('default');
-				const inboxId = this.getNodeParameter('inbox_id') as string;
+				const inboxId = this.getNodeParameter('inbox_id', '') as string;
 
 				await cekatApiRequest.call(
 					this,
 					'POST',
 					'/business_workflows/webhooks/subscribe',
-					{
-						events,
-						webhookUrl,
-						inboxId,
-					},
+					{ events, webhookUrl, inboxId },
 					'server',
 				);
 
 				return true;
 			},
 
-			async delete(this: ITriggerFunctions) {
+			async delete(this: ITriggerFunctions): Promise<boolean> {
 				const events = this.getNodeParameter('events') as string[];
 				const webhookUrl = this.getNodeWebhookUrl('default');
-				const inboxId = this.getNodeParameter('inbox_id') as string;
+				const inboxId = this.getNodeParameter('inbox_id', '') as string;
 
 				await cekatApiRequest.call(
 					this,
 					'POST',
 					'/business_workflows/webhooks/unsubscribe',
-					{
-						events,
-						webhookUrl,
-						inboxId,
-					},
+					{ events, webhookUrl, inboxId },
 					'server',
 				);
 
@@ -144,6 +127,8 @@ export class CekatTrigger implements INodeType {
 	}
 
 	methods = {
-		loadOptions: { ...options },
+		loadOptions: {
+			...options,
+		},
 	};
 }

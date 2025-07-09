@@ -41,3 +41,67 @@ export const conversationOperation: INodeProperties[] = [
 		default: 'assignAgent',
 	},
 ];
+
+export const conversationFields: INodeProperties[] = [
+	// 📌 Digunakan oleh SEMUA operation
+	{
+		displayName: 'Conversation ID',
+		name: 'conversationId',
+		type: 'string',
+		default: '',
+		required: true,
+		description: 'ID of the conversation',
+		displayOptions: {
+			show: {
+				resource: ['conversation'],
+				operation: ['resolveConversation', 'assignLabel', 'assignAgent', 'addCollaborator'],
+			},
+		},
+	},
+
+	// 📌 assignAgent & addCollaborator
+	{
+		displayName: 'Agent ID',
+		name: 'agentId',
+		type: 'string',
+		default: '',
+		required: true,
+		description: 'ID of the agent',
+		displayOptions: {
+			show: {
+				resource: ['conversation'],
+				operation: ['assignAgent', 'addCollaborator'],
+			},
+		},
+	},
+
+	// 📌 assignLabel only
+	{
+		displayName: 'Label ID',
+		name: 'labelId',
+		type: 'string',
+		default: '',
+		required: true,
+		description: 'ID of the label',
+		displayOptions: {
+			show: {
+				resource: ['conversation'],
+				operation: ['assignLabel'],
+			},
+		},
+	},
+	{
+		displayName: 'Stage Status',
+		name: 'stage_status',
+		type: 'string',
+		default: '',
+		required: true,
+		description: 'The stage status to change the conversation to',
+		displayOptions: {
+			show: {
+				resource: ['conversation'],
+				operation: ['changeStageStatus'],
+			},
+		},
+	},
+];
