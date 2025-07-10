@@ -44,66 +44,6 @@ export const credentialsProperty = (
 	},
 ];
 
-export const authenticationProperty = (propertyName = 'authentication'): INodeProperties => ({
-	displayName: 'Authentication',
-	name: propertyName,
-	type: 'options',
-	options: [
-		{
-			name: 'Basic Auth',
-			value: 'basicAuth',
-		},
-		{
-			name: 'Header Auth',
-			value: 'headerAuth',
-		},
-		{
-			name: 'JWT Auth',
-			value: 'jwtAuth',
-		},
-		{
-			name: 'None',
-			value: 'none',
-		},
-	],
-	default: 'none',
-	description: 'The way to authenticate',
-});
-
-export const httpMethodsProperty: INodeProperties = {
-	displayName: 'HTTP Method',
-	name: 'httpMethod',
-	type: 'options',
-	options: [
-		{
-			name: 'DELETE',
-			value: 'DELETE',
-		},
-		{
-			name: 'GET',
-			value: 'GET',
-		},
-		{
-			name: 'HEAD',
-			value: 'HEAD',
-		},
-		{
-			name: 'PATCH',
-			value: 'PATCH',
-		},
-		{
-			name: 'POST',
-			value: 'POST',
-		},
-		{
-			name: 'PUT',
-			value: 'PUT',
-		},
-	],
-	default: 'GET',
-	description: 'The HTTP method to listen to',
-};
-
 export const responseCodeProperty: INodeProperties = {
 	displayName: 'Response Code',
 	name: 'responseCode',
@@ -123,19 +63,14 @@ export const responseCodeProperty: INodeProperties = {
 
 const responseModeOptions = [
 	{
-		name: 'Immediately',
-		value: 'onReceived',
-		description: 'As soon as this node executes',
-	},
-	{
 		name: 'When Last Node Finishes',
 		value: 'lastNode',
 		description: 'Returns data of the last-executed node',
 	},
 	{
-		name: "Using 'Respond to Webhook' Node",
-		value: 'responseNode',
-		description: 'Response defined in that node',
+		name: 'Immediately',
+		value: 'onReceived',
+		description: 'As soon as this node executes',
 	},
 ];
 
@@ -144,40 +79,20 @@ export const responseModeProperty: INodeProperties = {
 	name: 'responseMode',
 	type: 'options',
 	options: responseModeOptions,
-	default: 'onReceived',
+	default: 'lastNode',
 	description: 'When and how to respond to the webhook',
-	displayOptions: {
-		show: {
-			'@version': [1, 1.1, 2],
-		},
-	},
-};
-
-export const responseModePropertyStreaming: INodeProperties = {
-	displayName: 'Respond',
-	name: 'responseMode',
-	type: 'options',
-	options: [
-		...responseModeOptions,
-		{
-			name: 'Streaming Response',
-			value: 'streaming',
-			description: 'Returns data in real time from streaming enabled nodes',
-		},
-	],
-	default: 'onReceived',
-	description: 'When and how to respond to the webhook',
-	displayOptions: {
-		hide: {
-			'@version': [1, 1.1, 2],
-		},
-	},
+	// displayOptions: {
+	// 	show: {
+	// 		'@version': [1, 1.1, 2],
+	// 	},
+	// },
 };
 
 export const responseDataProperty: INodeProperties = {
 	displayName: 'Response Data',
 	name: 'responseData',
 	type: 'options',
+
 	displayOptions: {
 		show: {
 			responseMode: ['lastNode'],
@@ -207,7 +122,7 @@ export const responseDataProperty: INodeProperties = {
 			description: 'Returns without a body',
 		},
 	],
-	default: 'firstEntryJson',
+	default: 'allEntries',
 	description:
 		'What data should be returned. If it should return all items as an array or only the first item as object.',
 };

@@ -109,7 +109,7 @@ export async function getAIAgentsDropdown(
 	const res = await cekatApiRequest.call(
 		this,
 		'GET',
-		'/business_workflows/agents',
+		'/business_workflows/ai-agents',
 		{},
 		{},
 		'server',

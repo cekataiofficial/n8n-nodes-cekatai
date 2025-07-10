@@ -3,42 +3,19 @@ import {
 	INodeType,
 	INodeTypeDescription,
 	IWebhookFunctions,
-	IWebhookResponseData,
-	IDataObject,
 	INodeExecutionData,
-	BINARY_ENCODING,
 } from 'n8n-workflow';
-import { cekatApiRequest } from '../Cekat/GenericFunctions';
+
 import * as options from '../Cekat/methods';
 import {
 	defaultWebhookDescription,
-	responseCodeProperty,
 	responseDataProperty,
 	responseModeProperty,
 	responseModePropertyStreaming,
 } from './description/ResponseOptions';
-import {
-	checkResponseModeConfiguration,
-	configuredOutputs,
-	setupOutputConnection,
-} from './description/utils';
-const responseModeOptions = [
-	{
-		name: 'Immediately',
-		value: 'onReceived',
-		description: 'As soon as this node executes',
-	},
-	{
-		name: 'When Last Node Finishes',
-		value: 'lastNode',
-		description: 'Returns data of the last-executed node',
-	},
-	{
-		name: "Using 'Respond to Webhook' Node",
-		value: 'responseNode',
-		description: 'Response defined in that node',
-	},
-];
+import { checkResponseModeConfiguration, configuredOutputs } from './description/utils';
+import { cekatApiRequest } from './GenericFunctions';
+
 export class CekatAiToolTrigger implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Cekat Ai Tool Trigger',
@@ -64,27 +41,27 @@ export class CekatAiToolTrigger implements INodeType {
 
 		properties: [
 			{
-				displayName: 'Choose AI Agent',
-				name: 'agentId',
-				type: 'options',
+				displayName: 'Choose AI Agents',
+				name: 'agentIds',
+				type: 'multiOptions',
 				typeOptions: {
 					loadOptionsMethod: 'getAIAgentsDropdown',
 				},
 				required: true,
-				default: '',
-				description: 'Select the AI agent to trigger the webhook for',
+				default: [],
+				description: 'Select one or more AI agents to trigger the webhook for',
 			},
 			{
-				displayName: 'Name',
-				name: 'name',
+				displayName: 'Tool Name',
+				name: 'toolName',
 				type: 'string',
 				required: true,
 				default: '',
 				description: 'The name of the AI tool',
 			},
 			{
-				displayName: 'Description',
-				name: 'description',
+				displayName: 'Tool Description',
+				name: 'toolDescription',
 				type: 'string',
 				typeOptions: {
 					rows: 4,
@@ -184,31 +161,6 @@ export class CekatAiToolTrigger implements INodeType {
 				description: 'The HTTP Response code to return',
 			},
 			responseModeProperty,
-			responseModePropertyStreaming,
-			{
-				displayName:
-					'Insert a \'Respond to Webhook\' node to control when and how you respond. <a href="https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.respondtowebhook/" target="_blank">More details</a>',
-				name: 'webhookNotice',
-				type: 'notice',
-				displayOptions: {
-					show: {
-						responseMode: ['responseNode'],
-					},
-				},
-				default: '',
-			},
-			{
-				displayName:
-					'Insert a node that supports streaming (e.g. \'AI Agent\') and enable streaming to stream directly to the response while the workflow is executed. <a href="https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.respondtowebhook/" target="_blank">More details</a>',
-				name: 'webhookStreamingNotice',
-				type: 'notice',
-				displayOptions: {
-					show: {
-						responseMode: ['streaming'],
-					},
-				},
-				default: '',
-			},
 			responseDataProperty,
 		],
 	};
@@ -220,49 +172,51 @@ export class CekatAiToolTrigger implements INodeType {
 		console.log(`Checking webhook for workflow: ${workflowName} (ID: ${workflowId})`);
 
 		// Sementara return false biar selalu trigger `create()`
-		return false;
+		return true;
 	}
 
 	async create(this: ITriggerFunctions): Promise<boolean> {
-		// const webhookUrl = this.getNodeWebhookUrl('default');
+		const agentIds = this.getNodeParameter('agentIds') as string[];
+		const name = this.getNodeParameter('name') as string;
+		const description = this.getNodeParameter('description') as string;
+		const aiInputsRaw = this.getNodeParameter('aiInputs', []) as any[];
+		const webhookUrl = this.getNodeWebhookUrl('default');
+		const workflowId = this.getWorkflow().id;
 
-		// const agentId = this.getNodeParameter('agentId') as string;
-		// const name = this.getNodeParameter('name') as string;
-		// const description = this.getNodeParameter('description') as string;
-		// const aiInputs = this.getNodeParameter('aiInputs') as any[];
+		console.log(`Creating webhook for workflow ID: ${workflowId}, Agents: ${agentIds.join(', ')}`);
+		// Format ulang aiInputs
+		const formattedInputs = (aiInputsRaw || []).map((item) => {
+			const input = item.input;
 
-		// const workflowId = this.getWorkflow().id;
-		// const workflowName = this.getWorkflow().name;
+			// Ambil enum values jika ada
+			const enumValues = (input.enum?.values || []).map((v: { value: string }) => v.value) || [];
 
-		// const expectResponse = this.getNodeParameter('expectResponse') as boolean;
+			return {
+				name: input.name,
+				description: input.description,
+				type: input.type,
+				required: input.required,
+				enum: enumValues.length > 0 ? enumValues : undefined,
+			};
+		});
 
-		// if (expectResponse) {
-		// 	this.helpers.returnJsonArray([
-		// 		{
-		// 			json: {
-		// 				notice:
-		// 					'⚠️ Kamu mengaktifkan "Expect Response" tapi belum menambahkan node Respond to Webhook.',
-		// 			},
-		// 		},
-		// 	]);
-		// }
+		// Hit API
+		const res = await cekatApiRequest.call(
+			this,
+			'POST',
+			'/business_workflows/ai-tools/create',
+			{
+				ai_agent_ids: agentIds,
+				name,
+				description,
+				ai_inputs: formattedInputs,
+				webhook_url: webhookUrl,
+				workflow_id: workflowId,
+			},
+			'server',
+		);
 
-		// await cekatApiRequest.call(
-		// 	this,
-		// 	'POST',
-		// 	'/ai-tools/subscribe',
-		// 	{
-		// 		webhookUrl,
-		// 		workflowId,
-		// 		workflowName,
-		// 		agentId,
-		// 		name,
-		// 		description,
-		// 		inputs: aiInputs,
-		// 	},
-		// 	'server',
-		// );
-
+		console.log(res);
 		return true;
 	}
 
@@ -288,41 +242,21 @@ export class CekatAiToolTrigger implements INodeType {
 		);
 		return true;
 	}
-	async webhook(this: IWebhookFunctions): Promise<IWebhookResponseData> {
+	async webhook(this: IWebhookFunctions): Promise<any> {
 		const workflowName = this.getWorkflow().name;
 		const workflowId = this.getWorkflow().id;
 		const workflowIsActive = this.getWorkflow().active;
 
+		const body = this.getBodyData();
 		const { typeVersion: nodeVersion, type: nodeType } = this.getNode();
 
 		if (nodeVersion >= 1 && nodeType === 'CUSTOM.cekatAiToolTrigger') {
 			checkResponseModeConfiguration(this);
 		}
 
-		const options = this.getNodeParameter('options', {}) as {
-			binaryData: boolean;
-			ignoreBots: boolean;
-			rawBody: boolean;
-			responseData?: string;
-			ipWhitelist?: string;
-		};
-
-		const req = this.getRequestObject();
-		const resp = this.getResponseObject();
-		const requestMethod = req.method;
-
-		let validationData: IDataObject | undefined;
-
-		const prepareOutput = setupOutputConnection(this, requestMethod, {
-			jwtPayload: validationData,
-		});
-
 		const response: INodeExecutionData = {
 			json: {
-				headers: req.headers,
-				params: req.params,
-				query: req.query,
-				body: req.body,
+				body,
 				context: {
 					workflowName,
 					workflowId,
@@ -332,8 +266,7 @@ export class CekatAiToolTrigger implements INodeType {
 		};
 
 		return {
-			webhookResponse: options.responseData,
-			workflowData: prepareOutput(response),
+			workflowData: [[response]], // Harus array dua dimensi
 		};
 	}
 	methods = {

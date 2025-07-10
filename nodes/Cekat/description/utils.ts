@@ -146,9 +146,13 @@ export const checkResponseModeConfiguration = (context: IWebhookFunctions) => {
 	const responseMode = context.getNodeParameter('responseMode', 'onReceived') as string;
 	const connectedNodes = context.getChildNodes(context.getNode().name);
 
+	console.log('Connected nodes:', connectedNodes);
 	const isRespondToWebhookConnected = connectedNodes.some(
 		(node) => node.type === 'n8n-nodes-base.respondToWebhook',
 	);
+
+	console.log('Is Respond to Webhook connected:', isRespondToWebhookConnected);
+	console.log('Response mode:', responseMode);
 
 	if (!isRespondToWebhookConnected && responseMode === 'responseNode') {
 		throw new NodeOperationError(
