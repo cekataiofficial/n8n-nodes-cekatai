@@ -17,11 +17,11 @@ import { handlers } from './handlers';
 
 export class Cekat implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'Cekat',
+		displayName: 'Cekat Chat',
 		name: 'cekat',
 		group: ['transform'],
 		version: 1,
-		description: 'Interact with Cekat API',
+		description: 'Interact with Cekat Chat API',
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
 		defaults: {
 			name: 'Cekat',
