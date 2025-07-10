@@ -67,19 +67,6 @@ export const lookupFields: INodeProperties[] = [
 		description: 'The ID of the conversation to get messages from',
 	},
 	{
-		displayName: 'Webhook URL',
-		name: 'webhookUrl',
-		type: 'string',
-		default: '',
-		required: true,
-		displayOptions: {
-			show: {
-				operation: ['getSubscribedWebhooks'],
-			},
-		},
-		description: 'The ID of the webhook to get subscribed webhooks from',
-	},
-	{
 		displayName: 'Type',
 		name: 'type',
 		type: 'string',

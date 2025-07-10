@@ -87,7 +87,7 @@ export async function handleLookup(
 			const res = await cekatApiRequest.call(
 				context,
 				'GET',
-				'/business_workflows/webhooks/subscribed',
+				'/business_workflows/webhooks',
 				{},
 				{},
 				'server',
