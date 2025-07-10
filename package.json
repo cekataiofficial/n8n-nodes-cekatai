@@ -35,7 +35,8 @@
 		],
 		"nodes": [
 			"dist/nodes/Cekat/Cekat.node.js",
-			"dist/nodes/Cekat/CekatTrigger.node.js"
+			"dist/nodes/Cekat/CekatTrigger.node.js",
+			"dist/nodes/Cekat/CekatAiToolTrigger.node.js"
 		]
 	},
 	"devDependencies": {

@@ -103,6 +103,24 @@ export async function getAgentsDropdown(
 	}));
 }
 
+export async function getAIAgentsDropdown(
+	this: ILoadOptionsFunctions,
+): Promise<INodePropertyOptions[]> {
+	const res = await cekatApiRequest.call(
+		this,
+		'GET',
+		'/business_workflows/agents',
+		{},
+		{},
+		'server',
+	);
+
+	return res.map((agent: { id: string; name: string }) => ({
+		name: agent.name,
+		value: agent.id,
+	}));
+}
+
 export async function getLabelsDropdown(
 	this: ILoadOptionsFunctions,
 ): Promise<INodePropertyOptions[]> {
