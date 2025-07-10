@@ -64,6 +64,9 @@ export const messageFields: INodeProperties[] = [
 		name: 'text',
 		type: 'string',
 		default: '',
+		typeOptions: {
+			rows: 4,
+		},
 		required: true,
 		description: 'The content of the text message',
 		displayOptions: {

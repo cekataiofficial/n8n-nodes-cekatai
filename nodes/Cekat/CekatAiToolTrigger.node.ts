@@ -58,6 +58,9 @@ export class CekatAiToolTrigger implements INodeType {
 				displayName: 'Description',
 				name: 'description',
 				type: 'string',
+				typeOptions: {
+					rows: 4,
+				},
 				required: false,
 				default: '',
 				description: 'The description of the AI tool',
