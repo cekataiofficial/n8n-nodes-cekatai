@@ -16,7 +16,7 @@ export async function handleSetPipelineStatus(
 	const response = await cekatApiRequest.call(
 		context,
 		'POST',
-		'/business_workflows/pipeline-status/update',
+		'/business_workflows/pipeline-status',
 		body,
 		{},
 		'server',

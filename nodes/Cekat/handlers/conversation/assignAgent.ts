@@ -16,7 +16,7 @@ export async function handleAssignAgent(
 	const response = await cekatApiRequest.call(
 		context,
 		'POST',
-		'/business_workflows/conversation/assign-agent',
+		'/business_workflows/assign-agent',
 		body,
 		{},
 		'server',

@@ -16,7 +16,7 @@ export async function handleAssignLabel(
 	const response = await cekatApiRequest.call(
 		context,
 		'POST',
-		'/business_workflows/conversation/label',
+		'/business_workflows/labels',
 		body,
 		{},
 		'server',

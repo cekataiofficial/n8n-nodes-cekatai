@@ -6,20 +6,20 @@ export async function handleChangeStageStatus(
 	i: number,
 ): Promise<INodeExecutionData> {
 	const conversationId = context.getNodeParameter('conversationId', i) as string;
-	const pipelineStatusId = context.getNodeParameter('pipelineStatusId', i) as string;
+	const stage_status = context.getNodeParameter('stage_status', i) as string;
 	const credentials = await context.getCredentials('CekatOpenApi');
 
 	const body = {
 		conversation_id: conversationId,
-		pipeline_status_id: pipelineStatusId,
+		stage_status: stage_status,
 	};
 
 	const response = await cekatApiRequest.call(
 		context,
 		'POST',
-		'/business_workflows/conversation/update-stage-status',
+		'/business_workflows/conversation-status',
 		body,
-		{ Authorization: `Bearer ${credentials.apiKey}` },
+		'',
 		'server',
 	);
 

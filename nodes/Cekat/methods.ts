@@ -127,7 +127,7 @@ export async function getPipelinesDropdown(
 	const res = await cekatApiRequest.call(
 		this,
 		'GET',
-		'/business_workflows/labels',
+		'/business_workflows/pipeline-status',
 		{},
 		{},
 		'server',

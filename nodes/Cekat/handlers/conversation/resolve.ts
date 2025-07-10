@@ -13,9 +13,9 @@ export async function handleResolveConversation(
 	const response = await cekatApiRequest.call(
 		context,
 		'POST',
-		'/business_workflows/conversation/resolve',
+		'/business_workflows/resolve-conversation',
 		body,
-		{ Authorization: `Bearer ${credentials.apiKey}` },
+		'',
 		'server',
 	);
 

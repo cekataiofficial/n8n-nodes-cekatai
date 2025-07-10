@@ -16,7 +16,7 @@ export async function handleAddCollaborator(
 	const response = await cekatApiRequest.call(
 		context,
 		'POST',
-		'/business_workflows/conversation/add-collaborator',
+		'/business_workflows/add-collaborator',
 		body,
 		{},
 		'server',
