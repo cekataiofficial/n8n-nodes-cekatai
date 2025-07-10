@@ -52,7 +52,14 @@ export const contactFields: INodeProperties[] = [
 				name: 'data',
 				values: [
 					{
-						displayName: 'Data Value (e.g., Name)',
+						displayName: 'Data Key (e.g., Name)',
+						name: 'key',
+						type: 'string',
+						default: '',
+						description: "The key to update in the contact's additional data.",
+					},
+					{
+						displayName: 'Data Value (e.g., John Doe)',
 						name: 'value',
 						type: 'string',
 						default: '',

@@ -2,7 +2,7 @@ import { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
 import { handleLookup } from './lookup/handleLookup';
 import { handleSendMessage } from './message/sendMessage';
 import { handleSendTemplateMessage } from './message/sendTemplateMessage';
-import { handleAddAdditionalData } from './contact/addAdditionalData';
+import { handleUpdateAdditionalData } from './contact/updateAdditionalData';
 import { handleSubscribeWebhook } from './webhook/subscribe';
 import { handleSetPipelineStatus } from './conversation/assignPipeline';
 
@@ -19,7 +19,7 @@ export const handlers: Record<
 	'message:sendMessage': handleSendMessage,
 	'message:sendTemplateMessage': handleSendTemplateMessage,
 
-	'contact:addAdditionalData': handleAddAdditionalData,
+	'contact:updateAdditionalData': handleUpdateAdditionalData,
 
 	'webhook:subscribe': handleSubscribeWebhook,
 	'webhook:unsubscribe': handleSubscribeWebhook,
