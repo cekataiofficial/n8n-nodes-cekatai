@@ -3,6 +3,8 @@ import { IExecuteFunctions, IRequestOptions } from 'n8n-workflow';
 const server_url = 'https://server.cekat.ai';
 const api_url = 'https://api.cekat.ai';
 
+// const server_url = 'http://localhost:3001';
+
 export async function cekatApiRequest(
 	this: IExecuteFunctions,
 	method: string,
