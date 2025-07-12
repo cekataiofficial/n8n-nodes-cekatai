@@ -107,7 +107,7 @@ export class CekatAiToolTrigger implements INodeType {
 									{ name: 'Boolean', value: 'boolean' },
 									{ name: 'Number', value: 'number' },
 								],
-								default: 'text',
+								default: 'string',
 							},
 							{
 								displayName: 'Required',
@@ -181,13 +181,12 @@ export class CekatAiToolTrigger implements INodeType {
 		
 				console.log(`Creating webhook for workflow ID: ${workflowId}, Agents: ${agentIds.join(', ')}`);
 
-
-				const formattedInputs = aiInputsRaw.input.map((input: any) => {
+				const formattedInputs = aiInputsRaw.input ? aiInputsRaw.input.map((input: any) => {
 					return {
 						...input,
 						enum: input.enum?.values?.map((v: any) => v.value) || undefined,
 					};
-				});
+				}) : null;
 				
 				
 
