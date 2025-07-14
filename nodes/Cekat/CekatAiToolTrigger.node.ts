@@ -22,7 +22,6 @@ export class CekatAiToolTrigger implements INodeType {
 		name: 'cekatAiToolTrigger',
 		group: ['trigger'],
 		version: [1, 1.1, 2, 2.1],
-		// Keep the default version as 2 to avoid releasing streaming in broken state
 		defaultVersion: 2,
 		description: 'Trigger node for receiving Cekat AI Tool webhooks',
 		icon: 'file:cekat.svg',
@@ -178,19 +177,20 @@ export class CekatAiToolTrigger implements INodeType {
 				const aiInputsRaw = this.getNodeParameter('aiInputs', []) as any[];
 				const webhookUrl = this.getNodeWebhookUrl('default');
 				const workflowId = this.getWorkflow().id;
-		
-				console.log(`Creating webhook for workflow ID: ${workflowId}, Agents: ${agentIds.join(', ')}`);
 
-				const formattedInputs = aiInputsRaw.input ? aiInputsRaw.input.map((input: any) => {
-					return {
-						...input,
-						enum: input.enum?.values?.map((v: any) => v.value) || undefined,
-					};
-				}) : null;
-				
-				
+				console.log(
+					`Creating webhook for workflow ID: ${workflowId}, Agents: ${agentIds.join(', ')}`,
+				);
 
-		
+				const formattedInputs = aiInputsRaw.input
+					? aiInputsRaw.input.map((input: any) => {
+							return {
+								...input,
+								enum: input.enum?.values?.map((v: any) => v.value) || undefined,
+							};
+						})
+					: null;
+
 				// Hit API
 				const res = await cekatApiRequest.call(
 					this,
@@ -206,31 +206,26 @@ export class CekatAiToolTrigger implements INodeType {
 					},
 					'server',
 				);
-		
+
 				console.log(res);
 				return true;
 			},
 
 			async delete(this: ITriggerFunctions): Promise<boolean> {
-
 				const webhookUrl = this.getNodeWebhookUrl('default');
 
 				await cekatApiRequest.call(
 					this,
 					'POST',
 					'/business_workflows/ai-tools/delete',
-					{ webhook_url:webhookUrl },
+					{ webhook_url: webhookUrl },
 					'server',
 				);
-		
 
 				return true;
-			}
+			},
 		},
 	};
-
-
-
 
 	async webhook(this: IWebhookFunctions): Promise<any> {
 		const workflowName = this.getWorkflow().name;

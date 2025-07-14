@@ -28,9 +28,6 @@ export const messageOperations: INodeProperties[] = [
 ];
 
 export const messageFields: INodeProperties[] = [
-	/* -------------------------------------------------------------------------- */
-	/*                             message: sendMessage                           */
-	/* -------------------------------------------------------------------------- */
 	{
 		displayName: 'Conversation ID',
 		name: 'conversationId',
@@ -77,16 +74,17 @@ export const messageFields: INodeProperties[] = [
 		},
 	},
 	{
-		displayName:
-			'📌 Note: File URL must end with a file name (e.g. `.jpg`, `.png`, `.pdf`, etc.)**',
+		displayName: '📌 Note: File URL must end with a file name (e.g. `.jpg`, `.png`, `.pdf`, etc.)',
 		name: 'fileUrlNotice',
 		type: 'notice',
 		default: '',
-		description: '',
 		displayOptions: {
 			show: {
 				resource: ['message'],
 				operation: ['sendMessage'],
+			},
+			hide: {
+				isInteractive: [true],
 			},
 		},
 	},
@@ -102,12 +100,289 @@ export const messageFields: INodeProperties[] = [
 				resource: ['message'],
 				operation: ['sendMessage'],
 			},
+			hide: {
+				isInteractive: [true],
+			},
 		},
 	},
+	{
+		displayName: 'Interactive Message',
+		name: 'isInteractive',
+		type: 'boolean',
+		default: false,
+		description: 'Enable this to send an interactive message (CTA, Button, List)',
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: ['sendMessage'],
+			},
+		},
+	},
+	{
+		displayName: 'Media Type',
+		name: 'mediaType',
+		type: 'options',
+		options: [
+			{
+				name: 'Call To Action',
+				value: 'cta_url',
+				description: 'Send a message with a call to action button (URL-based)',
+			},
+			{
+				name: 'Button',
+				value: 'button',
+				description: 'Send a message with quick reply buttons (max 3)',
+			},
+			{
+				name: 'List',
+				value: 'list',
+				description: 'Send a message with a list of grouped options',
+			},
+		],
+		default: 'cta_url',
+		typeOptions: {
+			rows: 4,
+		},
+		description: 'Choose the type of interactive message to send',
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: ['sendMessage'],
+				isInteractive: [true],
+			},
+		},
+	},
+	{
+		displayName: 'CTA Button',
+		name: 'ctaButton',
+		type: 'collection',
+		placeholder: 'Add CTA button details',
+		default: {},
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: ['sendMessage'],
+				isInteractive: [true],
+				mediaType: ['cta_url'],
+			},
+		},
+		options: [
+			{
+				displayName: 'Button Label',
+				name: 'display_text',
+				type: 'string',
+				default: 'Kunjungi Website',
+			},
+			{
+				displayName: 'Button URL',
+				name: 'url',
+				type: 'string',
+				default: 'https://tokokamu.com',
+			},
+		],
+	},
 
-	/* -------------------------------------------------------------------------- */
-	/*                        message: sendTemplateMessage                       */
-	/* -------------------------------------------------------------------------- */
+	{
+		displayName: '🔘 Quick Reply Buttons',
+		name: 'buttons',
+		type: 'fixedCollection',
+		default: [],
+		typeOptions: {
+			multipleValues: true,
+		},
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: ['sendMessage'],
+				isInteractive: [true],
+				mediaType: ['button'],
+			},
+		},
+		options: [
+			{
+				name: 'button',
+				displayName: 'Button',
+				values: [
+					{
+						displayName: 'Button ID',
+						name: 'id',
+						type: 'string',
+						default: 'beli_sekarang',
+					},
+					{
+						displayName: 'Button Label',
+						name: 'title',
+						type: 'string',
+						default: 'Beli Sekarang',
+					},
+				],
+			},
+		],
+		description: 'Add up to 3 reply buttons',
+	},
+	{
+		displayName: '📋 List - Button Text',
+		name: 'buttonText',
+		type: 'string',
+		default: 'Lihat Paket',
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: ['sendMessage'],
+				isInteractive: [true],
+				mediaType: ['list'],
+			},
+		},
+		description: 'Text shown on the list trigger button',
+	},
+	{
+		displayName: '📋 List - Sections',
+		name: 'sections',
+		type: 'fixedCollection',
+		default: [],
+		typeOptions: {
+			multipleValues: true,
+		},
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: ['sendMessage'],
+				isInteractive: [true],
+				mediaType: ['list'],
+			},
+		},
+		options: [
+			{
+				name: 'section',
+				displayName: 'Section',
+				values: [
+					{
+						displayName: 'Section Title',
+						name: 'title',
+						type: 'string',
+						default: 'Paket Pilihan',
+					},
+					{
+						displayName: 'Rows',
+						name: 'rows',
+						type: 'fixedCollection',
+						default: [],
+						typeOptions: {
+							multipleValues: true,
+						},
+						options: [
+							{
+								name: 'row',
+								displayName: 'Row',
+								values: [
+									{
+										displayName: 'Row ID',
+										name: 'id',
+										type: 'string',
+										default: 'paket_basic',
+									},
+									{
+										displayName: 'Row Title',
+										name: 'title',
+										type: 'string',
+										default: 'Paket Basic',
+									},
+									{
+										displayName: 'Row Description',
+										name: 'description',
+										type: 'string',
+										default: 'Cocok untuk pemula',
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		],
+		description: 'Group your list options into sections',
+	},
+
+	{
+		displayName: 'Header',
+		name: 'headerWithFileUrl',
+		type: 'collection',
+		placeholder: 'Add Header Details',
+		default: {},
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: ['sendMessage'],
+				isInteractive: [true],
+				mediaType: ['cta_url', 'button'],
+			},
+		},
+		options: [
+			{
+				displayName: 'Header Text',
+				name: 'header_text',
+				type: 'string',
+				default: 'Header Text',
+				description: 'Text to display in the header of the message',
+			},
+			{
+				displayName: 'Header File URL',
+				name: 'header_file_url',
+				type: 'string',
+				default: 'https://tokokamu.com',
+				description: 'Optional file URL for header (image, document, etc)',
+			},
+		],
+	},
+	{
+		displayName: 'Header',
+		name: 'headerWithoutFileUrl',
+		type: 'collection',
+		placeholder: 'Add Header Details',
+		default: {},
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: ['sendMessage'],
+				isInteractive: [true],
+				mediaType: ['list'],
+			},
+		},
+		options: [
+			{
+				displayName: 'Header Text',
+				name: 'header_text',
+				type: 'string',
+				default: 'Header Text',
+				description: 'Text to display in the header of the message',
+			},
+		],
+	},
+
+	{
+		displayName: 'Footer',
+		name: 'footer',
+		type: 'collection',
+		placeholder: 'Add Footer Details',
+		default: {},
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: ['sendMessage'],
+				isInteractive: [true],
+				mediaType: ['cta_url', 'button', 'list'],
+			},
+		},
+		options: [
+			{
+				displayName: 'Footer Text',
+				name: 'footer_text',
+				type: 'string',
+				default: 'Footer Text',
+				description: 'Text to display in the Footer of the message',
+			},
+		],
+	},
 ];
 
 export const templateFields: INodeProperties[] = [
