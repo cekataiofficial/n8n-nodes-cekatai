@@ -76,23 +76,34 @@ export const messageFields: INodeProperties[] = [
 			},
 		},
 	},
-	// {
-	// 	displayName: 'File URL',
-	// 	name: 'text',
-	// 	type: 'string',
-	// 	default: '',
-	// 	description: 'The URL of the file to send',
-	// 	placeholder: 'https://example.com/file.jpg',
-	// 	typeOptions: {
-	// 		multipleValues: true,
-	// 	},
-	// 	displayOptions: {
-	// 		show: {
-	// 			resource: ['message'],
-	// 			operation: ['sendMessage'],
-	// 		},
-	// 	},
-	// },
+	{
+		displayName:
+			'📌 Note: File URL must end with a file name (e.g. `.jpg`, `.png`, `.pdf`, etc.)**',
+		name: 'fileUrlNotice',
+		type: 'notice',
+		default: '',
+		description: '',
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: ['sendMessage'],
+			},
+		},
+	},
+	{
+		displayName: 'File URL',
+		name: 'fileUrl',
+		type: 'string',
+		default: '',
+		placeholder: 'https://example.com/file.jpg',
+		description: 'The URL of the file to send. The URL must include a file name at the end.',
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: ['sendMessage'],
+			},
+		},
+	},
 
 	/* -------------------------------------------------------------------------- */
 	/*                        message: sendTemplateMessage                       */
