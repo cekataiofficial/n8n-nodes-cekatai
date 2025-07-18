@@ -9,7 +9,7 @@ export const defaultWebhookDescription: IWebhookDescription = {
 	responseCode: `={{(${getResponseCode})($parameter)}}`,
 	responseMode: '={{$parameter["responseMode"]}}',
 	responseData: `={{(${getResponseData})($parameter)}}`,
-	path: 'webhook',
+	path: '={{$parameter["webhookPath"]}}',
 };
 
 export const credentialsProperty = (
