@@ -71,6 +71,19 @@ export async function handleLookup(
 			return { json: res };
 		}
 
+		case 'getContact': {
+			const phone_number = context.getNodeParameter('phoneNumber', i) as string;
+			const res = await cekatApiRequest.call(
+				context,
+				'GET',
+				'/business_workflows/contact',
+				{},
+				{ phone_number: phone_number },
+				'server',
+			);
+			return { json: res };
+		}
+
 		case 'getPipelineStatuses': {
 			const res = await cekatApiRequest.call(
 				context,

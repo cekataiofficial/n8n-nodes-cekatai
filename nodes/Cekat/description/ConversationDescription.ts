@@ -1,5 +1,24 @@
 import type { INodeProperties } from 'n8n-workflow';
 
+const allCurrencies = [
+	{ name: 'Indonesian Rupiah', value: 'idr' },
+	{ name: 'Singapore Dollar', value: 'sgd' },
+	{ name: 'Malaysian Ringgit', value: 'myr' },
+	{ name: 'Thai Baht', value: 'thb' },
+	{ name: 'Vietnamese Dong', value: 'vnd' },
+	{ name: 'Philippine Peso', value: 'php' },
+	{ name: 'Indian Rupee', value: 'inr' },
+	{ name: 'United States Dollar', value: 'usd' },
+	{ name: 'British Pound Sterling', value: 'gbp' },
+	{ name: 'Canadian Dollar', value: 'cad' },
+	{ name: 'Australian Dollar', value: 'aud' },
+	{ name: 'New Zealand Dollar', value: 'nzd' },
+	{ name: 'Swiss Franc', value: 'chf' },
+	{ name: 'Japanese Yen', value: 'jpy' },
+	{ name: 'Chinese Yuan', value: 'cny' },
+	{ name: 'Hong Kong Dollar', value: 'hkd' },
+]; //indo malay sgd asean
+
 export const conversationOperation: INodeProperties[] = [
 	{
 		displayName: 'Operation',
@@ -23,6 +42,11 @@ export const conversationOperation: INodeProperties[] = [
 				action: 'Assign a label to a conversation',
 			},
 			{
+				name: 'Remove Label',
+				value: 'removeLabel',
+				action: 'Remove a label from a conversation',
+			},
+			{
 				name: 'Assign Agent',
 				value: 'assignAgent',
 				action: 'Assign a agent to a conversation',
@@ -41,6 +65,16 @@ export const conversationOperation: INodeProperties[] = [
 				name: 'Set Pipeline Status',
 				value: 'setPipelineStatus',
 				action: 'Set the status of a pipeline',
+			},
+			{
+				name: 'Block AI',
+				value: 'blockAI',
+				action: 'Block the AI from a conversation',
+			},
+			{
+				name: 'Unblock AI',
+				value: 'unblockAI',
+				action: 'Unblock the AI from a conversation',
 			},
 		],
 		default: 'assignAgent',
@@ -69,7 +103,7 @@ export const conversationFields: INodeProperties[] = [
 		},
 	},
 
-	// 📌 assignLabel only
+	// 📌 assignLabel & removeLabel only
 	{
 		displayName: 'Select Label or Label ID',
 		name: 'labelId',
@@ -81,6 +115,39 @@ export const conversationFields: INodeProperties[] = [
 			loadOptionsMethod: 'getLabelsDropdown',
 		},
 		description: 'choose of the Label to assign',
+		displayOptions: {
+			show: {
+				resource: ['conversation'],
+				operation: ['assignLabel', 'removeLabel'],
+			},
+		},
+	},
+
+	//currency and value
+	// iso 4127 currency code options
+	{
+		displayName: 'Currency (Optional)',
+		name: 'currency',
+		type: 'options',
+		options: allCurrencies,
+		default: 'idr',
+		required: false,
+		description:
+			'The currency of the value to be set. Only needed for Conversion API / Meta Pixel Purchase Event',
+		displayOptions: {
+			show: {
+				resource: ['conversation'],
+				operation: ['assignLabel'],
+			},
+		},
+	},
+	{
+		displayName: 'Value (Optional)',
+		name: 'value',
+		type: 'number',
+		default: 0,
+		required: false,
+		description: 'The value to be set. Only needed for Conversion API / Meta Pixel Purchase Event',
 		displayOptions: {
 			show: {
 				resource: ['conversation'],
@@ -155,6 +222,9 @@ export const conversationFields: INodeProperties[] = [
 					'assignAgent',
 					'addCollaborator',
 					'changeStageStatus',
+					'blockAI',
+					'unblockAI',
+					'removeLabel',
 				],
 			},
 		},

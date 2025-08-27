@@ -47,6 +47,11 @@ export const lookupOperation: INodeProperties[] = [
 				value: 'getAllTemplates',
 				action: 'Get all templates',
 			},
+			{
+				name: 'Get Contact',
+				value: 'getContact',
+				action: 'Get a contact by phone number',
+			},
 		],
 		default: 'getMessages',
 	},
@@ -95,5 +100,18 @@ export const lookupFields: INodeProperties[] = [
 				operation: ['getAllTemplates'],
 			},
 		},
+	},
+	{
+		displayName: 'Contact Phone Number',
+		name: 'phoneNumber',
+		type: 'string',
+		default: '',
+		hint: '62081234567',
+		displayOptions: {
+			show: {
+				operation: ['getContact'],
+			},
+		},
+		description: 'Get contact by phone number',
 	},
 ];

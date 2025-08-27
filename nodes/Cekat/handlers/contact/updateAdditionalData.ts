@@ -11,10 +11,13 @@ export async function handleUpdateAdditionalData(
 		data?: { key: string; value: string }[];
 	};
 	const bodyAdditionalData = Array.isArray(additionalData.data)
-		? additionalData.data.reduce((acc, { key, value }) => {
-			if (key) acc[key] = value;
-			return acc;
-		}, {} as Record<string, string>)
+		? additionalData.data.reduce(
+				(acc, { key, value }) => {
+					if (key) acc[key] = value;
+					return acc;
+				},
+				{} as Record<string, string>,
+			)
 		: {};
 
 	const body = {
