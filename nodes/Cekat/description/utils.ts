@@ -3,7 +3,6 @@ import type {
 	IWebhookFunctions,
 	INodeExecutionData,
 	IDataObject,
-	ICredentialDataDecryptedObject,
 } from 'n8n-workflow';
 
 export type WebhookParameters = {
