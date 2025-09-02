@@ -12,7 +12,7 @@ export async function handleGetAllBoards(
 		'/api/crm/boards',
 		{},
 		{},
-		'staging',
+		'server',
 	);
 
 	return {
@@ -37,7 +37,7 @@ export async function handleGetBoard(
 		`/api/crm/boards/${boardId}`,
 		{},
 		{},
-		'staging',
+		'server',
 	);
 
 	return {
@@ -63,7 +63,7 @@ export async function handleGetAllItems(
 		`/api/crm/boards/${boardId}/items`,
 		{},
 		{},
-		'staging',
+		'server',
 	);
 
 	return {
@@ -90,7 +90,7 @@ export async function handleGetItem(
 		`/api/crm/boards/${boardId}/items/${itemId}`,
 		{},
 		{},
-		'staging',
+		'server',
 	);
 
 	return {

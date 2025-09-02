@@ -181,7 +181,7 @@ export async function getBoards(this: ILoadOptionsFunctions): Promise<INodePrope
 			'/api/crm/boards',
 			{},
 			{},
-			'staging',
+			'server',
 		);
 
 		console.log('getBoards response:', JSON.stringify(res, null, 2));
@@ -232,7 +232,7 @@ export async function getGroups(this: ILoadOptionsFunctions): Promise<INodePrope
 			`/api/crm/boards/${boardId}`,
 			{},
 			{},
-			'staging',
+			'server',
 		);
 		
 		console.log('getGroups response for boardId:', boardId);
@@ -268,7 +268,7 @@ export async function getItems(this: ILoadOptionsFunctions): Promise<INodeProper
 			`/api/crm/boards/${boardId}/items`,
 			{},
 			{},
-			'staging',
+			'server',
 		);
 		
 		console.log('getItems response:', JSON.stringify(res, null, 2));
@@ -313,7 +313,7 @@ export async function getBoardColumns(this: ILoadOptionsFunctions): Promise<INod
 			`/api/crm/boards/${boardId}`,
 			{},
 			{},
-			'staging',
+			'server',
 		);
 		
 		console.log('getBoardColumns response:', JSON.stringify(res, null, 2));
@@ -364,7 +364,7 @@ export async function getStageOptions(this: ILoadOptionsFunctions): Promise<INod
 			`/api/crm/boards/${boardId}`,
 			{},
 			{},
-			'staging',
+			'server',
 		);
 		
 		if (res.message === 'success' && res.data?.crm_columns) {
