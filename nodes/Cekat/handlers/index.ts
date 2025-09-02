@@ -5,7 +5,6 @@ import { handleSendTemplateMessage } from './message/sendTemplateMessage';
 import { handleUpdateAdditionalData } from './contact/updateAdditionalData';
 import { handleSubscribeWebhook } from './webhook/subscribe';
 import { handleSetPipelineStatus } from './conversation/assignPipeline';
-
 import { handleAssignLabel } from './conversation/assignLabel';
 import { handleRemoveLabel } from './conversation/removeLabel';
 import { handleAssignAgent } from './conversation/assignAgent';
@@ -14,19 +13,36 @@ import { handleChangeStageStatus } from './conversation/changeStageStatus';
 import { handleResolveConversation } from './conversation/resolve';
 import { handleBlockAi } from './conversation/blockAi';
 import { handleUnblockAi } from './conversation/unblockAi';
+// Import CRM lookup handlers
+import {
+	handleGetAllBoards,
+	handleGetBoard,
+	handleGetAllItems,
+	handleGetItem
+} from './lookup/handleLookupCRM';
+// Import CRM action handlers
+import { 
+	handleCreateItem, 
+	handleDeleteItems, 
+	handleUpdateItem 
+} from './lookup/handleActionCRM'; // atau './action/handleActionCRM' sesuai struktur folder
 
 export const handlers: Record<
 	string,
 	(context: IExecuteFunctions, i: number) => Promise<INodeExecutionData>
 > = {
+	// Message operations
 	'message:sendMessage': handleSendMessage,
 	'message:sendTemplateMessage': handleSendTemplateMessage,
-
+	
+	// Contact operations
 	'contact:updateAdditionalData': handleUpdateAdditionalData,
-
+	
+	// Webhook operations
 	'webhook:subscribe': handleSubscribeWebhook,
 	'webhook:unsubscribe': handleSubscribeWebhook,
-
+	
+	// Conversation operations
 	'conversation:setPipelineStatus': handleSetPipelineStatus,
 	'conversation:resolveConversation': handleResolveConversation,
 	'conversation:blockAI': handleBlockAi,
@@ -36,8 +52,8 @@ export const handlers: Record<
 	'conversation:assignAgent': handleAssignAgent,
 	'conversation:addCollaborator': handleAddCollaborator,
 	'conversation:changeStageStatus': handleChangeStageStatus,
-
-	// other handlers...
+	
+	// General lookup operations (existing)
 	'lookup:getMessages': handleLookup,
 	'lookup:getAllTemplates': handleLookup,
 	'lookup:getLabels': handleLookup,
@@ -46,4 +62,15 @@ export const handlers: Record<
 	'lookup:getContact': handleLookup,
 	'lookup:getPipelineStatuses': handleLookup,
 	'lookup:getSubscribedWebhooks': handleLookup,
+	
+	// CRM lookup operations (✅ removed duplicates)
+	'lookup:getAllBoards': handleGetAllBoards,
+	'lookup:getBoard': handleGetBoard,
+	'lookup:getAllItems': handleGetAllItems,
+	'lookup:getItem': handleGetItem,
+	
+	// CRM action operations
+	'action:createItem': handleCreateItem,
+	'action:updateItem': handleUpdateItem,
+	'action:deleteItems': handleDeleteItems,
 };

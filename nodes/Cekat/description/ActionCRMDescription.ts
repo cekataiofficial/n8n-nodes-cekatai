@@ -52,11 +52,29 @@ export const actionCRMFields: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Group ID',
+		displayName: 'Group',
 		name: 'groupId',
+		type: 'options',
+		typeOptions: {
+			loadOptionsMethod: 'getGroups',
+			loadOptionsDependsOn: ['boardId'],
+		},
+		default: '',
+		description: 'Group/Category where the item will be placed (optional)',
+		displayOptions: {
+			show: {
+				resource: ['action'],
+				operation: ['createItem'],
+			},
+		},
+	},
+	{
+		displayName: 'Item Name',
+		name: 'itemName',
 		type: 'string',
 		default: '',
-		description: 'Group/Category ID where the item will be placed (optional)',
+		required: true,
+		description: 'Name of the item (required by API)',
 		displayOptions: {
 			show: {
 				resource: ['action'],
@@ -65,130 +83,48 @@ export const actionCRMFields: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Additional Fields',
-		name: 'additionalFields',
-		type: 'collection',
-		placeholder: 'Add Field',
-		default: {},
-		displayOptions: {
-			show: {
-				resource: ['action'],
-				operation: ['createItem'],
-			},
-		},
-		options: [
-			{
-				displayName: 'Close Probability',
-				name: 'closeProbability',
-				type: 'number',
-				typeOptions: {
-					minValue: 0,
-					maxValue: 100,
-				},
-				default: 50,
-				description: 'Close probability percentage (0-100)',
-			},
-			{
-				displayName: 'Deal Value',
-				name: 'dealValue',
-				type: 'number',
-				default: 0,
-				description: 'Deal value amount',
-			},
-			{
-				displayName: 'Deal Value Currency',
-				name: 'dealValueCurrency',
-				type: 'options',
-				options: [
-					{ name: 'USD ($)', value: '$' },
-					{ name: 'EUR (€)', value: '€' },
-					{ name: 'IDR (Rp)', value: 'Rp' },
-					{ name: 'GBP (£)', value: '£' },
-				],
-				default: '$',
-				description: 'Currency for deal value',
-			},
-			{
-				displayName: 'Expected Close Date',
-				name: 'expectedCloseDate',
-				type: 'dateTime',
-				default: '',
-				description: 'Expected close date for the deal',
-			},
-			{
-				displayName: 'Forecast Value',
-				name: 'forecastValue',
-				type: 'number',
-				default: 0,
-				description: 'Forecast value amount',
-			},
-			{
-				displayName: 'Last Interaction',
-				name: 'lastInteraction',
-				type: 'dateTime',
-				default: '',
-				description: 'Date of last interaction',
-			},
-			{
-				displayName: 'Stage',
-				name: 'stage',
-				type: 'string',
-				default: '0',
-				description: 'Stage ID (0=New, 1=Discovery, 2=Proposal, etc.)',
-			},
-		],
-	},
-	{
-		displayName: 'Custom Fields',
-		name: 'customFields',
+		displayName: 'Columns to Fill',
+		name: 'columns',
+		placeholder: 'Add Column',
 		type: 'fixedCollection',
-		placeholder: 'Add Custom Field',
-		default: { field: [] },
 		typeOptions: {
 			multipleValues: true,
 		},
+		default: {},
+		options: [
+			{
+				displayName: 'Column',
+				name: 'column',
+				values: [
+					{
+						displayName: 'Column to Fill',
+						name: 'columnName',
+						type: 'options',
+						typeOptions: {
+							loadOptionsMethod: 'getBoardColumns',
+							loadOptionsDependsOn: ['boardId'],
+						},
+						default: '',
+						description: 'Select which column you want to fill',
+					},
+					{
+						displayName: 'Column Value',
+						name: 'value',
+						type: 'string',
+						default: '',
+						description: 'Value for the selected column (format depends on column type)',
+					},
+				],
+			},
+		],
 		displayOptions: {
 			show: {
 				resource: ['action'],
 				operation: ['createItem'],
 			},
 		},
-		options: [
-			{
-				name: 'field',
-				displayName: 'Field',
-				values: [
-					{
-						displayName: 'Field Name',
-						name: 'name',
-						type: 'string',
-						default: '',
-						description: 'Name of the custom field',
-					},
-					{
-						displayName: 'Field Value',
-						name: 'value',
-						type: 'string',
-						default: '',
-						description: 'Value of the custom field',
-					},
-					{
-						displayName: 'Field Type',
-						name: 'type',
-						type: 'options',
-						options: [
-							{ name: 'Text', value: 'text' },
-							{ name: 'Number', value: 'number' },
-							{ name: 'Date', value: 'date' },
-							{ name: 'Boolean', value: 'boolean' },
-						],
-						default: 'text',
-						description: 'Type of the custom field',
-					},
-				],
-			},
-		],
 	},
+
 
 	// ========== UPDATE ITEM FIELDS ==========
 	{
@@ -227,66 +163,34 @@ export const actionCRMFields: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Update Fields',
-		name: 'updateFields',
-		type: 'collection',
-		placeholder: 'Add Field to Update',
-		default: {},
+		displayName: 'Column to Update',
+		name: 'columnToUpdate',
+		type: 'options',
+		typeOptions: {
+			loadOptionsMethod: 'getBoardColumns',
+			loadOptionsDependsOn: ['boardId'],
+		},
+		default: '',
+		description: 'Select which column you want to update',
 		displayOptions: {
 			show: {
 				resource: ['action'],
 				operation: ['updateItem'],
 			},
 		},
-		options: [
-			{
-				displayName: 'Close Probability',
-				name: 'closeProbability',
-				type: 'number',
-				typeOptions: {
-					minValue: 0,
-					maxValue: 100,
-				},
-				default: 50,
-				description: 'New close probability percentage (0-100)',
+	},
+	{
+		displayName: 'New Value',
+		name: 'newValue',
+		type: 'string',
+		default: '',
+		description: 'New value for the selected column (format depends on column type)',
+		displayOptions: {
+			show: {
+				resource: ['action'],
+				operation: ['updateItem'],
 			},
-			{
-				displayName: 'Deal Value',
-				name: 'dealValue',
-				type: 'number',
-				default: 0,
-				description: 'New deal value amount',
-			},
-			{
-				displayName: 'Expected Close Date',
-				name: 'expectedCloseDate',
-				type: 'dateTime',
-				default: '',
-				description: 'New expected close date',
-			},
-			{
-				displayName: 'Forecast Value',
-				name: 'forecastValue',
-				type: 'number',
-				default: 0,
-				description: 'New forecast value amount',
-			},
-			{
-				displayName: 'Group ID',
-				name: 'groupId',
-				type: 'string',
-				default: '',
-				description: 'New group/category ID',
-			},
-
-			{
-				displayName: 'Stage',
-				name: 'stage',
-				type: 'string',
-				default: '',
-				description: 'New stage ID',
-			},
-		],
+		},
 	},
 
 	// ========== DELETE ITEMS FIELDS ==========
@@ -308,26 +212,31 @@ export const actionCRMFields: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Item IDs',
+		displayName: 'Item Names or IDs',
 		name: 'itemIds',
-		type: 'string',
-		default: '',
+		type: 'multiOptions',
+		typeOptions: {
+			loadOptionsMethod: 'getItems',
+			loadOptionsDependsOn: ['boardId'],
+		},
+		default: [],
 		required: true,
-		description: 'Comma-separated list of item IDs to delete (e.g., id1,id2,id3)',
+		description: 'Select one or more items to delete',
 		displayOptions: {
 			show: {
 				resource: ['action'],
 				operation: ['deleteItems'],
 			},
 		},
-	},
+	}
+,	
 	{
 		displayName: 'Confirm Deletion',
 		name: 'confirmDelete',
 		type: 'boolean',
 		default: false,
 		required: true,
-		description: 'Whether you must confirm that you want to delete these items',
+		description: 'You must confirm that you want to delete these items',
 		displayOptions: {
 			show: {
 				resource: ['action'],

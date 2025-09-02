@@ -7,15 +7,15 @@ import {
 } from 'n8n-workflow';
 
 import * as options from './methods';
-
-import { lookupOperation as lookupCRMOperation, lookupFields as lookupCRMFields } from './description/LookupCRMDescription';
 import { handlers } from './handlers';
 import { actionCRMFields, actionCRMOperation } from './description/ActionCRMDescription';
+import { lookupCRMFields, lookupCRMOperation } from './description/LookupCRMDescription';
 
-export class CekatCrm implements INodeType {
+// PERBAIKAN UTAMA: Pastikan class name dan export sesuai dengan file name
+export class CekatCRM implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Cekat CRM',
-		name: 'cekatCrm',
+		name: 'cekatCrm', // HARUS sama dengan class name (camelCase)
 		group: ['transform'],
 		version: 1,
 		description: 'Interact with Cekat CRM API untuk mengelola contact dan lookup data',
@@ -44,12 +44,9 @@ export class CekatCrm implements INodeType {
 				],
 				default: 'lookup',
 			},
-
-		
 			// Lookup operations
 			...lookupCRMOperation,
 			...lookupCRMFields,
-
 			// Action operations
 			...actionCRMOperation,
 			...actionCRMFields,
@@ -60,6 +57,15 @@ export class CekatCrm implements INodeType {
 		loadOptions: {
 			getBoards: options.getBoards,
 			getItems: options.getItems,
+			getBoardColumns: options.getBoardColumns,
+			getStageOptions: options.getStageOptions,
+			getGroups: options.getGroups,
+			getLabelsDropdown: options.getLabelsDropdown,
+			getPipelinesDropdown: options.getPipelinesDropdown,
+			getInboxesDropdown: options.getInboxesDropdown,
+			getAgentsDropdown: options.getAgentsDropdown,
+			getAIAgentsDropdown: options.getAIAgentsDropdown,
+			getTemplates: options.getTemplates,
 		},
 	};
 
@@ -83,7 +89,10 @@ export class CekatCrm implements INodeType {
 				returnData.push(result);
 			} catch (error) {
 				if (this.continueOnFail()) {
-					returnData.push({ json: { error: (error as Error).message }, pairedItem: i });
+					returnData.push({ 
+						json: { error: (error as Error).message }, 
+						pairedItem: i 
+					});
 					continue;
 				}
 				throw error;
