@@ -1,5 +1,31 @@
 import type { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
 import { cekatApiRequest } from '../../GenericFunctions';
+import { formatColumnValue } from '../../description/ActionCRMDescription';
+
+export function processCreateItemColumns(columns: any[]): Record<string, any> {
+	const processedColumns: Record<string, any> = {};
+	
+	columns.forEach((col, idx) => {
+		console.log(`👉 Column[${idx}] raw:`, col);
+		if (col.columnName && col.valueType) {
+			const formatted = formatColumnValue(
+				col.columnName,
+				col.valueType,
+				col
+			);
+			console.log(`👉 Column[${idx}] formatted:`, formatted);
+			Object.assign(processedColumns, formatted);
+		}
+	});
+	
+	return processedColumns;
+}
+
+
+export function processUpdateItemColumn(columnName: string, valueType: string, params: any): Record<string, any> {
+	return formatColumnValue(columnName, valueType, params);
+}
+
 
 export async function handleCreateItem(
 	context: IExecuteFunctions,
@@ -9,31 +35,25 @@ export async function handleCreateItem(
 	const groupId = context.getNodeParameter('groupId', i, '') as string;
 	const itemName = context.getNodeParameter('itemName', i, '') as string;
 
-	
+	// Ambil semua columns
+	const columns = context.getNodeParameter('columns', i, {}) as any;
+
+	// Gunakan helper biar format sesuai tipe
+	const columnData = processCreateItemColumns(columns.column || []);
+
+	console.log('columnData', columnData);
+
 	// Build request body
-	const requestBody: any = {};
-
-	const columns = context.getNodeParameter('columns', i, {}) as { column: Array<{ columnName: string, value: string }> };
-
-if (columns?.column?.length) {
-	for (const col of columns.column) {
-		if (col.columnName && col.value !== undefined) {
-			requestBody[col.columnName] = col.value; // col.columnName = nama kolom
-		}
-	}
-}
-
-	
-
+	const requestBody: any = {
+		...columnData,
+	};
 
 	if (itemName) {
 		requestBody.item_name = itemName;
 	}
-	// Add group_id if provided
 	if (groupId) {
 		requestBody.group_id = groupId;
 	}
-
 
 	const response = await cekatApiRequest.call(
 		context,
@@ -41,7 +61,7 @@ if (columns?.column?.length) {
 		`/api/crm/boards/${boardId}/items`,
 		requestBody,
 		{},
-		'server',
+		'staging',
 	);
 
 	return {
@@ -63,19 +83,24 @@ export async function handleUpdateItem(
 	const boardId = context.getNodeParameter('boardId', i) as string;
 	const itemId = context.getNodeParameter('itemId', i) as string;
 	const columnToUpdate = context.getNodeParameter('columnToUpdate', i) as string;
-	const newValue = context.getNodeParameter('newValue', i) as string;
+	const valueType = context.getNodeParameter('valueType', i) as string; // 🔥 ambil tipe
+	const params = {
+		stringValue: context.getNodeParameter('stringValue', i, '') as string,
+		numberValue: context.getNodeParameter('numberValue', i, undefined) as number,
+		dateValue: context.getNodeParameter('dateValue', i, '') as string,
+		agentValue: context.getNodeParameter('agentValue', i, undefined) as number,
+		booleanValue: context.getNodeParameter('booleanValue', i, false) as boolean,
+	};
 	
-	const requestBody: any = {};
-	if (columnToUpdate && newValue !== undefined) {
-		requestBody[columnToUpdate] = newValue; // columnToUpdate = columnName
-	}
+	const requestBody: any = processUpdateItemColumn(columnToUpdate, valueType, params);
+
 	const response = await cekatApiRequest.call(
 		context,
 		'PUT',
 		`/api/crm/boards/${boardId}/items/${itemId}`,
 		requestBody,
 		{},
-		'server',
+		'staging',
 	);
 
 	return {
@@ -90,6 +115,7 @@ export async function handleUpdateItem(
 		pairedItem: i,
 	};
 }
+
 
 export async function handleDeleteItems(
 	context: IExecuteFunctions,
@@ -126,9 +152,9 @@ export async function handleDeleteItems(
 			context,
 			'DELETE',
 			`/api/crm/boards/${boardId}/items`,
-			{ item_ids: itemIds }, // 👈 batch delete langsung
+			{ item_ids: itemIds },
 			{},
-			'server',
+			'staging',
 		);
 
 		return {
@@ -153,6 +179,5 @@ export async function handleDeleteItems(
 			},
 			pairedItem: i,
 		};
-	}	
+	}
 }
-
