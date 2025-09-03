@@ -1,30 +1,6 @@
 import type { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
 import { cekatApiRequest } from '../../GenericFunctions';
-import { formatColumnValue } from '../../description/ActionCRMDescription';
-
-export function processCreateItemColumns(columns: any[]): Record<string, any> {
-	const processedColumns: Record<string, any> = {};
-	
-	columns.forEach((col, idx) => {
-		console.log(`👉 Column[${idx}] raw:`, col);
-		if (col.columnName && col.valueType) {
-			const formatted = formatColumnValue(
-				col.columnName,
-				col.valueType,
-				col
-			);
-			console.log(`👉 Column[${idx}] formatted:`, formatted);
-			Object.assign(processedColumns, formatted);
-		}
-	});
-	
-	return processedColumns;
-}
-
-
-export function processUpdateItemColumn(columnName: string, valueType: string, params: any): Record<string, any> {
-	return formatColumnValue(columnName, valueType, params);
-}
+import { formatColumnValue, processCreateItemColumns, processUpdateItemColumn } from '../../description/ActionCRMDescription';
 
 
 export async function handleCreateItem(
@@ -61,7 +37,7 @@ export async function handleCreateItem(
 		`/api/crm/boards/${boardId}/items`,
 		requestBody,
 		{},
-		'staging',
+		'server',
 	);
 
 	return {
@@ -82,17 +58,45 @@ export async function handleUpdateItem(
 ): Promise<INodeExecutionData> {
 	const boardId = context.getNodeParameter('boardId', i) as string;
 	const itemId = context.getNodeParameter('itemId', i) as string;
-	const columnToUpdate = context.getNodeParameter('columnToUpdate', i) as string;
-	const valueType = context.getNodeParameter('valueType', i) as string; // 🔥 ambil tipe
-	const params = {
-		stringValue: context.getNodeParameter('stringValue', i, '') as string,
-		numberValue: context.getNodeParameter('numberValue', i, undefined) as number,
-		dateValue: context.getNodeParameter('dateValue', i, '') as string,
-		agentValue: context.getNodeParameter('agentValue', i, undefined) as number,
-		booleanValue: context.getNodeParameter('booleanValue', i, false) as boolean,
-	};
-	
-	const requestBody: any = processUpdateItemColumn(columnToUpdate, valueType, params);
+
+	// Ambil semua columns dari fixedCollection
+	const columns = context.getNodeParameter('columns.column', i, []) as any[];
+
+	const requestBody: Record<string, any> = {};
+
+	for (const col of columns) {
+		const columnName = col.columnName as string;
+		const valueType = col.valueType as string;
+
+		// Semua params yang mungkin dipakai helper
+		const params = {
+			stringValue: col.stringValue || '',
+			numberValue: col.numberValue || 0,
+			dropdownValues: col.dropdownValues || '',
+			timelineFrom: col.timelineFrom || '',
+			timelineTo: col.timelineTo || '',
+			files: col.files || {},
+			referenceIds: col.referenceIds || '',
+			agentIds: col.agentIds || [],
+			contactIds: col.contactIds || [],
+			companyIds: col.companyIds || [],
+			orderIds: col.orderIds || [],
+			subscriptionIds: col.subscriptionIds || [],
+			conversationValue: col.conversationValue || '',
+			textValue: col.textValue || '',
+			dateValue: col.dateValue || '',
+			emailValue: col.emailValue || '',
+			phoneValue: col.phoneValue || '',
+			longTextValue: col.longTextValue || '',
+			checkboxValue: col.checkboxValue || false,
+			selectValue: col.selectValue || '',
+		};
+
+		const formatted = processUpdateItemColumn(columnName, valueType, params);
+		Object.assign(requestBody, formatted);
+	}
+
+	console.log('requestBody', requestBody);
 
 	const response = await cekatApiRequest.call(
 		context,
@@ -100,7 +104,7 @@ export async function handleUpdateItem(
 		`/api/crm/boards/${boardId}/items/${itemId}`,
 		requestBody,
 		{},
-		'staging',
+		'server',
 	);
 
 	return {
@@ -154,7 +158,7 @@ export async function handleDeleteItems(
 			`/api/crm/boards/${boardId}/items`,
 			{ item_ids: itemIds },
 			{},
-			'staging',
+			'server',
 		);
 
 		return {

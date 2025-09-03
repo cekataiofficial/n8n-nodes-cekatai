@@ -62,10 +62,21 @@ export function formatColumnValue(columnName: string, valueType: string, params:
 				[columnName]: Number(params.numberValue) || 0
 			};
 
-		case 'date':
-			return {
-				[columnName]: params.dateValue || ''
-			};
+	
+			case 'date':
+				if (!params.dateValue) return { [columnName]: '' };
+			
+				const date = new Date(params.dateValue);
+				const offset = -date.getTimezoneOffset(); // dibalik tanda, supaya + untuk timur
+				const sign = offset >= 0 ? '+' : '-';
+				const absOffset = Math.abs(offset);
+				const hours = String(Math.floor(absOffset / 60)).padStart(2, '0');
+				const minutes = String(absOffset % 60).padStart(2, '0');
+			
+				const isoWithTZ = date.toISOString().replace('Z', `${sign}${hours}:${minutes}`);
+				return { [columnName]: isoWithTZ };
+			
+
 
 		case 'checkbox':
 			return {
@@ -123,10 +134,29 @@ export function processCreateItemColumns(columns: any[]): Record<string, any> {
 	return processedColumns;
 }
 
-// Function to process single column for update operation
+// Function to process multiple columns for update operation
+export function processUpdateItemColumns(columns: any[]): Record<string, any> {
+	const processedColumns: Record<string, any> = {};
+	
+	columns.forEach((col) => {
+		if (col.column?.columnName && col.column?.valueType) {
+			const formatted = formatColumnValue(
+				col.column.columnName,
+				col.column.valueType,
+				col.column
+			);
+			Object.assign(processedColumns, formatted);
+		}
+	});
+	
+	return processedColumns;
+}
+
+// Function to process single column for update operation (kept for backward compatibility)
 export function processUpdateItemColumn(columnName: string, valueType: string, params: any): Record<string, any> {
 	return formatColumnValue(columnName, valueType, params);
 }
+
 export const actionCRMOperation: INodeProperties[] = [
 	{
 		displayName: 'Operation',
@@ -483,196 +513,238 @@ export const actionCRMFields: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Column to Update',
-		name: 'columnToUpdate',
-		type: 'options',
-		typeOptions: {
-			loadOptionsMethod: 'getBoardColumns',
-			loadOptionsDependsOn: ['boardId'],
-		},
-		default: '',
-		description: 'Select which column you want to update',
-		displayOptions: {
-			show: {
-				resource: ['action'],
-				operation: ['updateItem'],
-			},
-		},
-	},
-	{
-		displayName: 'Value Type',
-		name: 'valueType',
-		type: 'options',
-		options: [
-			{
-				name: 'Text/String',
-				value: 'string',
-				description: 'For text, email, phone, url, link, location, date, datetime, status, priority columns',
-			},
-			{
-				name: 'Number',
-				value: 'number',
-				description: 'For numeric columns',
-			},
-			{
-				name: 'Dropdown (Multiple Options)',
-				value: 'dropdown',
-				description: 'For dropdown/multi-select columns',
-			},
-			{
-				name: 'Timeline (Date Range)',
-				value: 'timeline',
-				description: 'For timeline columns with from/to dates',
-			},
-			{
-				name: 'Files',
-				value: 'files',
-				description: 'For file attachment columns',
-			},
-			{
-				name: 'References (UUIDs)',
-				value: 'references',
-				description: 'For agents, contacts, companies, subscriptions, orders, references columns',
-			},
-		],
-		default: 'string',
-		description: 'Select the type of value you want to provide',
-		displayOptions: {
-			show: {
-				resource: ['action'],
-				operation: ['updateItem'],
-			},
-		},
-	},
-	// Update operation value fields
-	{
-		displayName: 'New Text Value',
-		name: 'stringValue',
-		type: 'string',
-		default: '',
-		description: 'New value for text-based columns',
-		displayOptions: {
-			show: {
-				resource: ['action'],
-				operation: ['updateItem'],
-				valueType: ['string'],
-			},
-		},
-	},
-	{
-		displayName: 'New Number Value',
-		name: 'numberValue',
-		type: 'number',
-		default: 0,
-		description: 'New numeric value',
-		displayOptions: {
-			show: {
-				resource: ['action'],
-				operation: ['updateItem'],
-				valueType: ['number'],
-			},
-		},
-	},
-	{
-		displayName: 'New Dropdown Options',
-		name: 'dropdownValues',
-		type: 'string',
-		default: '',
-		description: 'Comma-separated values (e.g., "Option1,Option2,Option3")',
-		displayOptions: {
-			show: {
-				resource: ['action'],
-				operation: ['updateItem'],
-				valueType: ['dropdown'],
-			},
-		},
-	},
-	{
-		displayName: 'Timeline From Date',
-		name: 'timelineFrom',
-		type: 'string',
-		default: '',
-		description: 'Start date (ISO format: YYYY-MM-DD)',
-		displayOptions: {
-			show: {
-				resource: ['action'],
-				operation: ['updateItem'],
-				valueType: ['timeline'],
-			},
-		},
-	},
-	{
-		displayName: 'Timeline To Date',
-		name: 'timelineTo',
-		type: 'string',
-		default: '',
-		description: 'End date (ISO format: YYYY-MM-DD)',
-		displayOptions: {
-			show: {
-				resource: ['action'],
-				operation: ['updateItem'],
-				valueType: ['timeline'],
-			},
-		},
-	},
-	{
-		displayName: 'Files',
-		name: 'files',
-		placeholder: 'Add File',
+		displayName: 'Columns to Update',
+		name: 'columns',
+		placeholder: 'Add Column',
 		type: 'fixedCollection',
 		typeOptions: {
 			multipleValues: true,
 		},
 		default: {},
-		description: 'Files to attach',
-		displayOptions: {
-			show: {
-				resource: ['action'],
-				operation: ['updateItem'],
-				valueType: ['files'],
-			},
-		},
 		options: [
 			{
-				displayName: 'File',
-				name: 'file',
+				displayName: 'Column',
+				name: 'column',
 				values: [
 					{
-						displayName: 'File Name',
-						name: 'fileName',
-						type: 'string',
+						displayName: 'Column to Update',
+						name: 'columnName',
+						type: 'options',
+						typeOptions: {
+							loadOptionsMethod: 'getBoardColumns',
+							loadOptionsDependsOn: ['boardId'],
+						},
 						default: '',
-						description: 'Name of the file',
+						description: 'Select which column you want to update',
 					},
 					{
-						displayName: 'File URL',
-						name: 'fileUrl',
-						type: 'string',
-						default: '',
-						description: 'URL of the file',
+						displayName: 'Value Type',
+						name: 'valueType',
+						type: 'options',
+						options: [
+							{
+								name: 'Agents',
+								value: 'agents',
+								description: 'For selecting one or more agents',
+							},
+							{
+								name: 'Date',
+								value: 'date',
+								description: 'For date picker columns',
+							},
+							{
+								name: 'Text/String',
+								value: 'string',
+								description: 'For text, email, phone, url, link, location, date, datetime, status, priority columns',
+							},
+							{
+								name: 'Number',
+								value: 'number',
+								description: 'For numeric columns',
+							},
+							{
+								name: 'Dropdown (Multiple Options)',
+								value: 'dropdown',
+								description: 'For dropdown/multi-select columns',
+							},
+							{
+								name: 'Timeline (Date Range)',
+								value: 'timeline',
+								description: 'For timeline columns with from/to dates',
+							},
+							{
+								name: 'Files',
+								value: 'files',
+								description: 'For file attachment columns',
+							},
+							{
+								name: 'References (UUIDs)',
+								value: 'references',
+								description: 'For agents, contacts, companies, subscriptions, orders, references columns',
+							},
+						],
+						default: 'string',
+						description: 'Select the type of value you want to provide',
 					},
 					{
-						displayName: 'File Type',
-						name: 'fileType',
+						displayName: 'Select Agents',
+						name: 'agentIds',
+						type: 'multiOptions',
+						typeOptions: {
+							loadOptionsMethod: 'getAgentsDropdown',
+						},
+						default: [],
+						description: 'Select one or more agents',
+						displayOptions: {
+							show: {
+								valueType: ['agents'],
+							},
+						},
+					},
+					// Date picker
+					{
+						displayName: 'Select Date',
+						name: 'dateValue',
+						type: 'dateTime',
+						default: '',
+						description: 'Pick a date',
+						displayOptions: {
+							show: {
+								valueType: ['date'],
+							},
+						},
+					},
+					// String value
+					{
+						displayName: 'New Text Value',
+						name: 'stringValue',
 						type: 'string',
 						default: '',
-						description: 'MIME type (e.g., image/png, application/pdf)',
+						description: 'New value for text-based columns',
+						displayOptions: {
+							show: {
+								valueType: ['string'],
+							},
+						},
+					},
+					// Number value
+					{
+						displayName: 'New Number Value',
+						name: 'numberValue',
+						type: 'number',
+						default: 0,
+						description: 'New numeric value',
+						displayOptions: {
+							show: {
+								valueType: ['number'],
+							},
+						},
+					},
+					// Dropdown values
+					{
+						displayName: 'New Dropdown Options',
+						name: 'dropdownValues',
+						type: 'string',
+						default: '',
+						description: 'Comma-separated values (e.g., "Option1,Option2,Option3")',
+						displayOptions: {
+							show: {
+								valueType: ['dropdown'],
+							},
+						},
+					},
+					// Timeline from
+					{
+						displayName: 'Timeline From Date',
+						name: 'timelineFrom',
+						type: 'string',
+						default: '',
+						description: 'Start date (ISO format: YYYY-MM-DD)',
+						displayOptions: {
+							show: {
+								valueType: ['timeline'],
+							},
+						},
+					},
+					// Timeline to
+					{
+						displayName: 'Timeline To Date',
+						name: 'timelineTo',
+						type: 'string',
+						default: '',
+						description: 'End date (ISO format: YYYY-MM-DD)',
+						displayOptions: {
+							show: {
+								valueType: ['timeline'],
+							},
+						},
+					},
+					// Files collection
+					{
+						displayName: 'Files',
+						name: 'files',
+						placeholder: 'Add File',
+						type: 'fixedCollection',
+						typeOptions: {
+							multipleValues: true,
+						},
+						default: {},
+						description: 'Files to attach',
+						displayOptions: {
+							show: {
+								valueType: ['files'],
+							},
+						},
+						options: [
+							{
+								displayName: 'File',
+								name: 'file',
+								values: [
+									{
+										displayName: 'File Name',
+										name: 'fileName',
+										type: 'string',
+										default: '',
+										description: 'Name of the file',
+									},
+									{
+										displayName: 'File URL',
+										name: 'fileUrl',
+										type: 'string',
+										default: '',
+										description: 'URL of the file',
+									},
+									{
+										displayName: 'File Type',
+										name: 'fileType',
+										type: 'string',
+										default: '',
+										description: 'MIME type (e.g., image/png, application/pdf)',
+									},
+								],
+							},
+						],
+					},
+					// Reference IDs
+					{
+						displayName: 'Reference UUIDs',
+						name: 'referenceIds',
+						type: 'string',
+						default: '',
+						description: 'Comma-separated UUIDs for reference columns',
+						displayOptions: {
+							show: {
+								valueType: ['references'],
+							},
+						},
 					},
 				],
 			},
 		],
-	},
-	{
-		displayName: 'Reference UUIDs',
-		name: 'referenceIds',
-		type: 'string',
-		default: '',
-		description: 'Comma-separated UUIDs for reference columns',
 		displayOptions: {
 			show: {
 				resource: ['action'],
 				operation: ['updateItem'],
-				valueType: ['references'],
 			},
 		},
 	},

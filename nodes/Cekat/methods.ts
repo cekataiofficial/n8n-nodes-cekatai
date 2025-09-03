@@ -90,7 +90,7 @@ export async function getAgentsDropdown(
 		'/business_workflows/agents',
 		{},
 		{},
-		'staging',
+		'server',
 	);
 
 	return res.map((agent: { id: string; name: string }) => ({
@@ -108,7 +108,7 @@ export async function getAIAgentsDropdown(
 		'/business_workflows/ai-agents',
 		{},
 		{},
-		'staging',
+		'server',
 	);
 
 	return res.map((agent: { id: string; name: string }) => ({
@@ -126,7 +126,7 @@ export async function getLabelsDropdown(
 		'/business_workflows/labels',
 		{},
 		{},
-		'staging',
+		'server',
 	);
 
 	return res.map((labels: { id: string; name: string }) => ({
@@ -144,7 +144,7 @@ export async function getPipelinesDropdown(
 		'/business_workflows/pipeline-status',
 		{},
 		{},
-		'staging',
+		'server',
 	);
 
 	return res.map((pipelines: { id: string; name: string; color: string }) => ({
@@ -163,7 +163,7 @@ export async function getInboxesDropdown(
 		'/business_workflows/inboxes',
 		{},
 		{},
-		'staging',
+		'server',
 	);
 
 	return res.map((inbox: { id: string; name: string }) => ({

@@ -92,38 +92,9 @@ export class CekatCRM implements INodeType {
 					// Option 2: Or pass directly to handler if you modify handler signature
 					
 				} else if (operation === 'updateItem') {
-					const columnName = this.getNodeParameter('columnToUpdate', i) as string;
-					const valueType = this.getNodeParameter('valueType', i) as string;
-					
-					// Get all parameters for this item
-					const allParams = {
-						textValue: this.getNodeParameter('textValue', i, '') as string,
-						stringValue: this.getNodeParameter('stringValue', i, '') as string, // fallback
-						numberValue: this.getNodeParameter('numberValue', i, 0) as number,
-						dateValue: this.getNodeParameter('dateValue', i, '') as string,
-						emailValue: this.getNodeParameter('emailValue', i, '') as string,
-						phoneValue: this.getNodeParameter('phoneValue', i, '') as string,
-						longTextValue: this.getNodeParameter('longTextValue', i, '') as string,
-						checkboxValue: this.getNodeParameter('checkboxValue', i, false) as boolean,
-						selectValue: this.getNodeParameter('selectValue', i, '') as string,
-						dropdownValues: this.getNodeParameter('dropdownValues', i, '') as string,
-						timelineFrom: this.getNodeParameter('timelineFrom', i, '') as string,
-						timelineTo: this.getNodeParameter('timelineTo', i, '') as string,
-						files: this.getNodeParameter('files', i, {}) as any,
-						agentIds: this.getNodeParameter('agentIds', i, []) as string[],
-						contactIds: this.getNodeParameter('contactIds', i, []) as string[],
-						companyIds: this.getNodeParameter('companyIds', i, []) as string[],
-						orderIds: this.getNodeParameter('orderIds', i, []) as string[],
-						subscriptionIds: this.getNodeParameter('subscriptionIds', i, []) as string[],
-						conversationValue: this.getNodeParameter('conversationValue', i, '') as string,
-						referenceIds: this.getNodeParameter('referenceIds', i, '') as string,
-					};
-					
-					const formattedValue = processUpdateItemColumn(columnName, valueType, allParams);
-					
-					// Store formatted value for handler to access
-					items[i].json.formattedValue = formattedValue;
-					items[i].json.columnName = columnName;
+					const columns = this.getNodeParameter('columns.column', i, []) as any[];
+  					const formattedColumns = processCreateItemColumns(columns);
+  					items[i].json.formattedColumns = formattedColumns;
 				}
 	
 				const key = `${resource}:${operation}`;
