@@ -152,6 +152,65 @@ export const messageFields: INodeProperties[] = [
 			},
 		},
 	},
+	
+	// ===== BUTTON INPUT METHOD SELECTION =====
+	{
+		displayName: 'Button Input Method',
+		name: 'buttonInputMethod',
+		type: 'options',
+		options: [
+			{
+				name: 'Manual Entry',
+				value: 'manual',
+				description: 'Add buttons one by one manually',
+			},
+			{
+				name: 'Dynamic from Previous Node',
+				value: 'dynamic',
+				description: 'Use button data from previous node (JSON array)',
+			},
+		],
+		default: 'manual',
+		description: 'How do you want to provide the button data?',
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: ['sendMessage'],
+				isInteractive: [true],
+				mediaType: ['button'],
+			},
+		},
+	},
+	
+	// ===== LIST INPUT METHOD SELECTION =====
+	{
+		displayName: 'List Input Method',
+		name: 'listInputMethod',
+		type: 'options',
+		options: [
+			{
+				name: 'Manual Entry',
+				value: 'manual',
+				description: 'Add list sections one by one manually',
+			},
+			{
+				name: 'Dynamic from Previous Node',
+				value: 'dynamic',
+				description: 'Use list data from previous node (JSON array)',
+			},
+		],
+		default: 'manual',
+		description: 'How do you want to provide the list data?',
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: ['sendMessage'],
+				isInteractive: [true],
+				mediaType: ['list'],
+			},
+		},
+	},
+
 	{
 		displayName: 'CTA Button',
 		name: 'ctaButton',
@@ -182,6 +241,7 @@ export const messageFields: INodeProperties[] = [
 		],
 	},
 
+	// ===== MANUAL BUTTON ENTRY (EXISTING) =====
 	{
 		displayName: '🔘 Quick Reply Buttons',
 		name: 'buttons',
@@ -196,6 +256,7 @@ export const messageFields: INodeProperties[] = [
 				operation: ['sendMessage'],
 				isInteractive: [true],
 				mediaType: ['button'],
+				buttonInputMethod: ['manual'],
 			},
 		},
 		options: [
@@ -220,6 +281,52 @@ export const messageFields: INodeProperties[] = [
 		],
 		description: 'Add up to 3 reply buttons',
 	},
+	
+	// ===== DYNAMIC BUTTON ENTRY (NEW) =====
+	{
+		displayName: 'Dynamic Buttons (JSON)',
+		name: 'dynamicButtons',
+		type: 'string',
+		default: '[{"id":"yes","title":"Ya"},{"id":"no","title":"Tidak"}]',
+		typeOptions: {
+			rows: 4,
+		},
+		description: 'JSON array of buttons. Format: [{"id":"button_id","title":"Button Label"}]',
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: ['sendMessage'],
+				isInteractive: [true],
+				mediaType: ['button'],
+				buttonInputMethod: ['dynamic'],
+			},
+		},
+	},
+	
+	// ===== DYNAMIC BUTTON EXPRESSION HELPER =====
+	{
+		displayName: '💡 Dynamic Button Examples',
+		name: 'dynamicButtonExamples',
+		type: 'notice',
+		default: '',
+		description: `
+Examples of dynamic button usage:
+• From previous node: {{ $json.buttons }}
+• Static array: [{"id":"yes","title":"Ya"},{"id":"no","title":"Tidak"}]
+• Mixed: [{"id":"product_{{ $json.id }}","title":"{{ $json.name }}"}]
+		`,
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: ['sendMessage'],
+				isInteractive: [true],
+				mediaType: ['button'],
+				buttonInputMethod: ['dynamic'],
+			},
+		},
+	},
+
+	// ===== MANUAL LIST ENTRY (EXISTING) =====
 	{
 		displayName: '📋 List - Button Text',
 		name: 'buttonText',
@@ -231,6 +338,7 @@ export const messageFields: INodeProperties[] = [
 				operation: ['sendMessage'],
 				isInteractive: [true],
 				mediaType: ['list'],
+				listInputMethod: ['manual'],
 			},
 		},
 		description: 'Text shown on the list trigger button',
@@ -249,6 +357,7 @@ export const messageFields: INodeProperties[] = [
 				operation: ['sendMessage'],
 				isInteractive: [true],
 				mediaType: ['list'],
+				listInputMethod: ['manual'],
 			},
 		},
 		options: [
@@ -301,6 +410,63 @@ export const messageFields: INodeProperties[] = [
 			},
 		],
 		description: 'Group your list options into sections',
+	},
+	
+	// ===== DYNAMIC LIST ENTRY (NEW) =====
+	{
+		displayName: '📋 List - Button Text',
+		name: 'dynamicButtonText',
+		type: 'string',
+		default: 'Pilih Opsi',
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: ['sendMessage'],
+				isInteractive: [true],
+				mediaType: ['list'],
+				listInputMethod: ['dynamic'],
+			},
+		},
+		description: 'Text shown on the list trigger button',
+	},
+	{
+		displayName: 'Dynamic List Sections',
+		name: 'dynamicSections',
+		type: 'json',
+		default: [{"title":"Menu","rows":[{"id":"item1","title":"Item 1","description":"Deskripsi item 1"}]}],
+		description: 'Array of section objects with title and rows properties',
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: ['sendMessage'],
+				isInteractive: [true],
+				mediaType: ['list'],
+				listInputMethod: ['dynamic'],
+			},
+		},
+	},
+	
+	// ===== DYNAMIC LIST EXPRESSION HELPER =====
+	{
+		displayName: '💡 Dynamic List Examples',
+		name: 'dynamicListExamples',
+		type: 'notice',
+		default: '',
+		description: `
+Examples of dynamic list usage:
+• From previous node: {{ $json.menuSections }}
+• Product list: [{"title":"Products","rows":{{ $json.products.map(p => ({id: p.id, title: p.name, description: p.price})) }}}]
+• Categories: {{ $json.categories.map(cat => ({title: cat.name, rows: cat.items})) }}
+		`,
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: ['sendMessage'],
+				isInteractive: [true],
+				mediaType: ['list'],
+				listInputMethod: ['dynamic'],
+			},
+		},
 	},
 
 	{
