@@ -309,11 +309,23 @@ export const messageFields: INodeProperties[] = [
 		name: 'dynamicButtonExamples',
 		type: 'notice',
 		default: '',
-		description: `
-Examples of dynamic button usage:
-• From previous node: {{ $json.buttons }}
-• Static array: [{"id":"yes","title":"Ya"},{"id":"no","title":"Tidak"}]
-• Mixed: [{"id":"product_{{ $json.id }}","title":"{{ $json.name }}"}]
+		description: `		
+Contoh penggunaan dynamic buttons:
+
+🔘 Dari node sebelumnya:
+{{ $json.buttons }}
+
+✅ Array statis:
+[{"id":"yes","title":"Ya"},{"id":"no","title":"Tidak"}]
+
+🛒 Tombol produk dinamis:
+[{"id":"product_{{ $json.id }}","title":"Beli {{ $json.name }}"}]
+
+📞 Tombol aksi:
+[{"id":"call","title":"📞 Hubungi"},{"id":"whatsapp","title":"💬 WhatsApp"},{"id":"email","title":"📧 Email"}]
+
+🎯 Tombol konfirmasi:
+[{"id":"confirm","title":"✅ Konfirmasi"},{"id":"cancel","title":"❌ Batal"}]
 		`,
 		displayOptions: {
 			show: {
@@ -430,11 +442,14 @@ Examples of dynamic button usage:
 		description: 'Text shown on the list trigger button',
 	},
 	{
-		displayName: 'Dynamic List Sections',
+		displayName: 'Dynamic List Sections (JSON)',
 		name: 'dynamicSections',
-		type: 'json',
-		default: [{"title":"Menu","rows":[{"id":"item1","title":"Item 1","description":"Deskripsi item 1"}]}],
-		description: 'Array of section objects with title and rows properties',
+		type: 'string',
+		default: '[{"title":"Menu","rows":[{"id":"item1","title":"Item 1","description":"Deskripsi item 1"}]}]',
+		typeOptions: {
+			rows: 6,
+		},
+		description: 'JSON array of section objects with title and rows properties',
 		displayOptions: {
 			show: {
 				resource: ['message'],
@@ -453,10 +468,19 @@ Examples of dynamic button usage:
 		type: 'notice',
 		default: '',
 		description: `
-Examples of dynamic list usage:
-• From previous node: {{ $json.menuSections }}
-• Product list: [{"title":"Products","rows":{{ $json.products.map(p => ({id: p.id, title: p.name, description: p.price})) }}}]
-• Categories: {{ $json.categories.map(cat => ({title: cat.name, rows: cat.items})) }}
+Contoh penggunaan dynamic list:
+
+📋 Dari node sebelumnya:
+{{ $json.menuSections }}
+
+🛍️ Daftar produk:
+[{"title":"Produk Pilihan","rows":[{"id":"prod1","title":"Laptop Gaming","description":"Rp 15.000.000"},{"id":"prod2","title":"Smartphone","description":"Rp 5.000.000"}]}]
+
+📂 Kategori dinamis:
+{{ $json.categories.map(cat => ({title: cat.name, rows: cat.items.map(item => ({id: item.id, title: item.name, description: item.price}))})) }}
+
+🍕 Menu restoran:
+[{"title":"Makanan","rows":[{"id":"nasi_goreng","title":"Nasi Goreng","description":"Nasi goreng spesial"},{"id":"ayam_bakar","title":"Ayam Bakar","description":"Ayam bakar bumbu kecap"}]},{"title":"Minuman","rows":[{"id":"es_teh","title":"Es Teh","description":"Teh manis dingin"},{"id":"jus_jeruk","title":"Jus Jeruk","description":"Jus jeruk segar"}]}]
 		`,
 		displayOptions: {
 			show: {
