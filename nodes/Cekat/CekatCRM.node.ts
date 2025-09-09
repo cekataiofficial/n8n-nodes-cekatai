@@ -8,7 +8,7 @@ import {
 
 import * as options from './methods';
 import { handlers } from './handlers';
-import { actionCRMFields, actionCRMOperation, processCreateItemColumns, processUpdateItemColumn } from './description/ActionCRMDescription'
+import { actionCRMFields, actionCRMOperation, processCreateItemColumns, processUpdateItemColumn } from './description/ActionCRMDescription';
 import { lookupCRMFields, lookupCRMOperation } from './description/LookupCRMDescription';
 
 // PERBAIKAN UTAMA: Pastikan class name dan export sesuai dengan file name
@@ -66,9 +66,8 @@ export class CekatCRM implements INodeType {
 			getAgentsDropdown: options.getAgentsDropdown,
 			getAIAgentsDropdown: options.getAIAgentsDropdown,
 			getTemplates: options.getTemplates,
-
-
-
+			getSelectColumnOptions: options.getSelectColumnOptions,
+			debugParameterAccess: options.debugParameterAccess,
 		},
 	};
 
@@ -81,23 +80,78 @@ export class CekatCRM implements INodeType {
 				const resource = this.getNodeParameter('resource', i) as string;
 				const operation = this.getNodeParameter('operation', i) as string;
 	
+				console.log(`=== Processing Item ${i}: ${resource}:${operation} ===`);
+	
 				// Process column data based on operation before calling handler
 				if (operation === 'createItem') {
-					const columns = this.getNodeParameter('columns.column', i, []) as any[];
-					const formattedColumns = processCreateItemColumns(columns);
+					console.log('Processing createItem columns...');
 					
-					// Store formatted columns in a way that handlers can access it
-					// Option 1: Store in items[i].json for handler to access
-					items[i].json.formattedColumns = formattedColumns;
+					// Try multiple methods to get columns data
+					let columns: any[] = [];
 					
-					// Option 2: Or pass directly to handler if you modify handler signature
+					try {
+						// Method 1: Direct path
+						columns = this.getNodeParameter('columns.column', i, []) as any[];
+						console.log('Method 1 (columns.column) result:', JSON.stringify(columns, null, 2));
+					} catch (error) {
+						console.log('Method 1 failed:', error.message);
+						
+						try {
+							// Method 2: Fallback to columns object
+							const columnsObj = this.getNodeParameter('columns', i, {}) as any;
+							columns = columnsObj.column || [];
+							console.log('Method 2 (columns object) result:', JSON.stringify(columns, null, 2));
+						} catch (error2) {
+							console.log('Method 2 also failed:', error2.message);
+						}
+					}
+	
+					console.log(`Found ${columns.length} columns to process`);
 					
+					if (columns.length > 0) {
+						const formattedColumns = processCreateItemColumns(columns);
+						console.log('Formatted columns result:', JSON.stringify(formattedColumns, null, 2));
+						
+						// Store formatted columns for handler to access
+						items[i].json.formattedColumns = formattedColumns;
+					} else {
+						console.log('No columns data found, setting empty formattedColumns');
+						items[i].json.formattedColumns = {};
+					}
+	
 				} else if (operation === 'updateItem') {
-					const columns = this.getNodeParameter('columns.column', i, []) as any[];
-  					const formattedColumns = processCreateItemColumns(columns);
-  					items[i].json.formattedColumns = formattedColumns;
+					console.log('Processing updateItem columns...');
+					
+					let columns: any[] = [];
+					
+					try {
+						columns = this.getNodeParameter('columns.column', i, []) as any[];
+						console.log('Update columns data:', JSON.stringify(columns, null, 2));
+					} catch (error) {
+						console.log('Failed to get update columns:', error.message);
+						
+						try {
+							const columnsObj = this.getNodeParameter('columns', i, {}) as any;
+							columns = columnsObj.column || [];
+						} catch (error2) {
+							console.log('Fallback method also failed for update:', error2.message);
+						}
+					}
+	
+					console.log(`Found ${columns.length} columns to update`);
+					
+					if (columns.length > 0) {
+						const formattedColumns = processCreateItemColumns(columns); // Reuse same function
+						console.log('Formatted update columns result:', JSON.stringify(formattedColumns, null, 2));
+						
+						items[i].json.formattedColumns = formattedColumns;
+					} else {
+						console.log('No update columns data found, setting empty formattedColumns');
+						items[i].json.formattedColumns = {};
+					}
 				}
 	
+				// Call the appropriate handler
 				const key = `${resource}:${operation}`;
 				const handler = handlers[key];
 	
@@ -105,13 +159,25 @@ export class CekatCRM implements INodeType {
 					throw new ApplicationError(`No handler registered for resource:operation "${key}"`);
 				}
 	
+				console.log(`Calling handler for ${key}...`);
 				const result = await handler(this, i);
+				console.log(`Handler ${key} completed successfully`);
+				
 				returnData.push(result);
+	
 			} catch (error) {
+				console.error(`Error processing item ${i}:`, error);
+				
 				if (this.continueOnFail()) {
-					returnData.push({ 
-						json: { error: (error as Error).message }, 
-						pairedItem: i 
+					returnData.push({
+						json: { 
+							error: (error as Error).message,
+							item: i,
+							resource: this.getNodeParameter('resource', i, ''),
+							operation: this.getNodeParameter('operation', i, ''),
+							timestamp: new Date().toISOString()
+						},
+						pairedItem: i
 					});
 					continue;
 				}
@@ -119,6 +185,7 @@ export class CekatCRM implements INodeType {
 			}
 		}
 	
+		console.log(`=== Execution completed: ${returnData.length}/${items.length} items processed ===`);
 		return [returnData];
 	}
 }

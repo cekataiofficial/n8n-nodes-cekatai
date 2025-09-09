@@ -8,8 +8,6 @@ import {
 
 import * as options from './methods/orderMethods';
 import { handlers } from './handlers';
-import { actionCRMFields, actionCRMOperation, processCreateItemColumns, processUpdateItemColumn } from './description/ActionCRMDescription';
-
 import { lookupOrderFields, lookupOrderOperation } from './description/LookupOrderDescription';
 import { actionOrderFields, actionOrderOperation } from './description/ActionOrderDescription';
 
