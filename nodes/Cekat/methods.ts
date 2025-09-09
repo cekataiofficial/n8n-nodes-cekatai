@@ -391,3 +391,275 @@ export async function getStageOptions(this: ILoadOptionsFunctions): Promise<INod
 }
 
 
+
+export async function getSelectColumnOptions(
+	this: ILoadOptionsFunctions
+): Promise<INodePropertyOptions[]> {
+	try {
+		const boardId = this.getNodeParameter('boardId', 0, '') as string;
+		
+		// Cara yang benar untuk mengakses columnName dari fixedCollection
+		let columnName = '';
+		
+		// Method 1: Coba akses dari parameter context
+		try {
+			// Dalam konteks loadOptions untuk fixedCollection, kita perlu mengakses dari collection yang sedang aktif
+			const columnsCollection = this.getNodeParameter('columns', 0, {}) as any;
+			console.log('Columns collection:', JSON.stringify(columnsCollection, null, 2));
+			
+			// Akses berdasarkan struktur fixedCollection: columns.column[index].columnName
+			if (columnsCollection.column && Array.isArray(columnsCollection.column)) {
+				// Ambil dari row terakhir yang sedang di-edit (biasanya yang paling baru)
+				const lastIndex = columnsCollection.column.length - 1;
+				if (lastIndex >= 0) {
+					columnName = columnsCollection.column[lastIndex]?.columnName || '';
+				}
+			}
+		} catch (error) {
+			console.log('Method 1 failed, trying alternative approach:', error.message);
+		}
+		
+		// Method 2: Jika masih kosong, coba dengan cara yang berbeda
+		if (!columnName) {
+			try {
+				// Coba akses langsung dengan path
+				columnName = this.getNodeParameter('columns.column.columnName', 0, '') as string;
+			} catch (error) {
+				console.log('Method 2 failed:', error.message);
+			}
+		}
+		
+		// Method 3: Fallback - ambil dari node parameters secara manual
+		if (!columnName) {
+			try {
+				const allParams = this.getNode().parameters;
+				console.log('All node parameters:', JSON.stringify(allParams, null, 2));
+				// Implementasi manual parsing jika diperlukan
+			} catch (error) {
+				console.log('Method 3 failed:', error.message);
+			}
+		}
+
+		console.log('getSelectColumnOptions called');
+		console.log('boardId:', boardId);
+		console.log('columnName:', columnName);
+
+		if (!boardId) {
+			console.log('No boardId provided');
+			return [];
+		}
+
+		if (!columnName) {
+			console.log('No columnName provided - returning empty array');
+			// Return empty array jika columnName belum dipilih
+			return [];
+		}
+
+		// Panggil API dengan endpoint dan body yang benar
+		const res = await cekatApiRequest.call(
+			this,
+			'POST',  // Gunakan POST sesuai dengan API spec
+			`/api/crm/boards/${boardId}/columns/by-name`,
+			{
+				name: columnName  // Body request berisi nama kolom
+			},
+			{}, // Query parameters kosong
+			'server',
+		);
+
+		console.log('API Response:', JSON.stringify(res, null, 2));
+
+		// Parse response sesuai dengan struktur yang Anda berikan
+		if (res.message === 'success' && res.data?.settings?.labels) {
+			return res.data.settings.labels
+				.filter((label: any) => label.id !== 'default') // Skip default option
+				.map((label: any) => ({
+					name: label.name,
+					value: label.id,
+					description: `${label.name} (Count: ${label.count || 0})`,
+				}));
+		}
+
+		console.log('No valid labels found in response');
+		return [];
+
+	} catch (error) {
+		console.error('Error in getSelectColumnOptions:', error);
+		
+		// Return fallback options untuk development/testing
+		return [
+			{ name: 'Kontak Pribadi', value: '1' },
+			{ name: 'Kontak Leasing', value: '2' },
+			{ name: 'Kontak Koperasi', value: '3' },
+			{ name: 'Tiktok', value: '4' },
+			{ name: 'Sosmed (IG, Youtube, FB)', value: '5' },
+			{ name: 'WI Store', value: '6' },
+			{ name: 'OLX', value: '7' },
+			{ name: 'Altius', value: '8' },
+		];
+	}
+}
+
+// TAMBAHAN: Function untuk debug parameter access
+export async function debugParameterAccess(
+	this: ILoadOptionsFunctions
+): Promise<INodePropertyOptions[]> {
+	try {
+		console.log('=== DEBUG PARAMETER ACCESS ===');
+		
+		// Method 1: Get all available parameters
+		const allParams = this.getNode().parameters;
+		console.log('All node parameters:', JSON.stringify(allParams, null, 2));
+		
+		// Method 2: Try different ways to access columns
+		const methods = [
+			() => this.getNodeParameter('columns', 0, {}),
+			() => this.getNodeParameter('columns.column', 0, []),
+			() => this.getNodeParameter('columns.column.0', 0, {}),
+			() => this.getNodeParameter('columns.column.0.columnName', 0, ''),
+		];
+		
+		methods.forEach((method, index) => {
+			try {
+				const result = method();
+				console.log(`Method ${index + 1} result:`, JSON.stringify(result, null, 2));
+			} catch (error) {
+				console.log(`Method ${index + 1} failed:`, error.message);
+			}
+		});
+		
+		return [{ name: 'Debug Complete - Check Console', value: 'debug' }];
+		
+	} catch (error) {
+		console.error('Debug error:', error);
+		return [{ name: 'Debug Error', value: 'error' }];
+	}
+}
+
+// PENDEKATAN ALTERNATIF: Jika akses columnName masih bermasalah
+// Buat function yang mengembalikan semua select options dari semua kolom select di board
+
+export async function getAllSelectColumnOptions(
+	this: ILoadOptionsFunctions
+): Promise<INodePropertyOptions[]> {
+	try {
+		const boardId = this.getNodeParameter('boardId', 0, '') as string;
+		
+		if (!boardId) {
+			return [];
+		}
+
+		console.log('Getting all select options for boardId:', boardId);
+
+		// 1. Pertama, ambil semua kolom di board
+		const boardRes = await cekatApiRequest.call(
+			this,
+			'GET',
+			`/api/crm/boards/${boardId}`,
+			{},
+			{},
+			'server',
+		);
+
+		if (boardRes.message !== 'success' || !boardRes.data?.crm_columns) {
+			return [];
+		}
+
+		// 2. Filter hanya kolom dengan type 'select'
+		const selectColumns = boardRes.data.crm_columns.filter(
+			(col: any) => col.type === 'select' && !col.read_only && col.is_visible
+		);
+
+		console.log('Found select columns:', selectColumns.length);
+
+		// 3. Untuk setiap kolom select, ambil options-nya
+		const allOptions: INodePropertyOptions[] = [];
+
+		for (const column of selectColumns) {
+			try {
+				// Panggil API untuk mendapatkan options kolom ini
+				const columnRes = await cekatApiRequest.call(
+					this,
+					'POST',
+					`/api/crm/boards/${boardId}/columns/by-name`,
+					{
+						name: column.name
+					},
+					{},
+					'server',
+				);
+
+				if (columnRes.message === 'success' && columnRes.data?.settings?.labels) {
+					const options = columnRes.data.settings.labels
+						.filter((label: any) => label.id !== 'default')
+						.map((label: any) => ({
+							name: `${column.name}: ${label.name}`,
+							value: `${column.name}|${label.id}`, // Encode column name dan value
+							description: `Column: ${column.name} | Option: ${label.name}`,
+						}));
+					
+					allOptions.push(...options);
+				}
+			} catch (error) {
+				console.error(`Error getting options for column ${column.name}:`, error);
+			}
+		}
+
+		console.log('Total select options found:', allOptions.length);
+		return allOptions;
+
+	} catch (error) {
+		console.error('Error in getAllSelectColumnOptions:', error);
+		return [];
+	}
+}
+
+// ATAU: Pendekatan dengan predefined mapping
+export async function getPredefinedSelectOptions(
+	this: ILoadOptionsFunctions
+): Promise<INodePropertyOptions[]> {
+	try {
+		const boardId = this.getNodeParameter('boardId', 0, '') as string;
+		
+		// Mapping kolom select yang umum digunakan
+		const commonSelectOptions: { [key: string]: INodePropertyOptions[] } = {
+			'Source Data': [
+				{ name: 'Kontak Pribadi', value: '1' },
+				{ name: 'Kontak Leasing', value: '2' },
+				{ name: 'Kontak Koperasi', value: '3' },
+				{ name: 'Tiktok', value: '4' },
+				{ name: 'Sosmed (IG, Youtube, FB)', value: '5' },
+				{ name: 'WI Store', value: '6' },
+				{ name: 'OLX', value: '7' },
+				{ name: 'Altius', value: '8' },
+			],
+			'Status': [
+				{ name: 'New', value: 'new' },
+				{ name: 'In Progress', value: 'progress' },
+				{ name: 'Completed', value: 'completed' },
+			],
+			'Priority': [
+				{ name: 'Low', value: 'low' },
+				{ name: 'Medium', value: 'medium' },
+				{ name: 'High', value: 'high' },
+			],
+		};
+
+		// Return semua options yang tersedia
+		const allOptions: INodePropertyOptions[] = [];
+		Object.entries(commonSelectOptions).forEach(([columnName, options]) => {
+			const prefixedOptions = options.map(opt => ({
+				...opt,
+				name: `${columnName}: ${opt.name}`,
+				value: `${columnName}|${opt.value}`,
+			}));
+			allOptions.push(...prefixedOptions);
+		});
+
+		return allOptions;
+
+	} catch (error) {
+		console.error('Error in getPredefinedSelectOptions:', error);
+		return [];
+	}
+}

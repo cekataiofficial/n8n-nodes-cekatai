@@ -1,6 +1,49 @@
 import type { INodeProperties } from 'n8n-workflow';
-// Utility function to format column values based on column type
+
+
+// PERBAIKAN untuk functions di ActionCRMDescription.ts
+
+// Function to process multiple columns for create operation - IMPROVED
+export function processCreateItemColumns(columns: any[]): Record<string, any> {
+	console.log('processCreateItemColumns called with:', JSON.stringify(columns, null, 2));
+	
+	const processedColumns: Record<string, any> = {};
+	
+	if (!columns || !Array.isArray(columns)) {
+		console.log('No valid columns array provided');
+		return processedColumns;
+	}
+	
+	columns.forEach((col, index) => {
+		console.log(`Processing column ${index}:`, JSON.stringify(col, null, 2));
+		
+		if (!col || !col.columnName || !col.valueType) {
+			console.log(`Skipping column ${index} - missing required fields`);
+			return;
+		}
+		
+		try {
+			const formatted = formatColumnValue(
+				col.columnName,
+				col.valueType,
+				col // Pass entire col object instead of just params
+			);
+			
+			console.log(`Formatted column ${col.columnName}:`, JSON.stringify(formatted, null, 2));
+			Object.assign(processedColumns, formatted);
+		} catch (error) {
+			console.error(`Error processing column ${col.columnName}:`, error);
+		}
+	});
+	
+	console.log('Final processedColumns:', JSON.stringify(processedColumns, null, 2));
+	return processedColumns;
+}
+
+// IMPROVED formatColumnValue function with better parameter handling
 export function formatColumnValue(columnName: string, valueType: string, params: any): any {
+	console.log(`Formatting column: ${columnName}, type: ${valueType}`, JSON.stringify(params, null, 2));
+	
 	switch (valueType) {
 		case 'timeline':
 			return {
@@ -58,29 +101,38 @@ export function formatColumnValue(columnName: string, valueType: string, params:
 			};
 
 		case 'number':
+			const numValue = Number(params.numberValue);
+			console.log(`Number conversion: ${params.numberValue} -> ${numValue}`);
 			return {
-				[columnName]: Number(params.numberValue) || 0
+				[columnName]: isNaN(numValue) ? 0 : numValue
 			};
 
-	
-			case 'date':
-				if (!params.dateValue) return { [columnName]: '' };
+		case 'date':
+			if (!params.dateValue) {
+				return { [columnName]: '' };
+			}
 			
+			try {
 				const date = new Date(params.dateValue);
-				const offset = -date.getTimezoneOffset(); // dibalik tanda, supaya + untuk timur
+				const offset = -date.getTimezoneOffset();
 				const sign = offset >= 0 ? '+' : '-';
 				const absOffset = Math.abs(offset);
 				const hours = String(Math.floor(absOffset / 60)).padStart(2, '0');
 				const minutes = String(absOffset % 60).padStart(2, '0');
-			
+				
 				const isoWithTZ = date.toISOString().replace('Z', `${sign}${hours}:${minutes}`);
+				console.log(`Date conversion: ${params.dateValue} -> ${isoWithTZ}`);
 				return { [columnName]: isoWithTZ };
-			
-
+			} catch (error) {
+				console.error('Date conversion error:', error);
+				return { [columnName]: '' };
+			}
 
 		case 'checkbox':
+			const boolValue = Boolean(params.checkboxValue);
+			console.log(`Checkbox conversion: ${params.checkboxValue} -> ${boolValue}`);
 			return {
-				[columnName]: Boolean(params.checkboxValue)
+				[columnName]: boolValue
 			};
 
 		case 'email':
@@ -99,6 +151,7 @@ export function formatColumnValue(columnName: string, valueType: string, params:
 			};
 
 		case 'select':
+			console.log(`Select value: ${params.selectValue}`);
 			return {
 				[columnName]: params.selectValue || ''
 			};
@@ -109,29 +162,30 @@ export function formatColumnValue(columnName: string, valueType: string, params:
 			};
 
 		case 'text':
+		case 'string':
 		default:
+			const textValue = params.textValue || params.stringValue || '';
+			console.log(`Text conversion: ${params.textValue || params.stringValue} -> ${textValue}`);
 			return {
-				[columnName]: params.textValue || params.stringValue || ''
+				[columnName]: textValue
 			};
 	}
 }
 
-// Function to process multiple columns for create operation
-export function processCreateItemColumns(columns: any[]): Record<string, any> {
-	const processedColumns: Record<string, any> = {};
+// DEBUG function to inspect parameters structure
+export function debugColumnParameters(columns: any[]): void {
+	console.log('=== COLUMN DEBUG INFO ===');
+	console.log('Total columns:', columns.length);
 	
-	columns.forEach((col) => {
-		if (col.column?.columnName && col.column?.valueType) {
-			const formatted = formatColumnValue(
-				col.column.columnName,
-				col.column.valueType,
-				col.column
-			);
-			Object.assign(processedColumns, formatted);
-		}
+	columns.forEach((col, index) => {
+		console.log(`Column ${index}:`);
+		console.log('  - columnName:', col.columnName);
+		console.log('  - valueType:', col.valueType);
+		console.log('  - All properties:', Object.keys(col));
+		console.log('  - Raw data:', JSON.stringify(col, null, 2));
 	});
 	
-	return processedColumns;
+	console.log('=== END DEBUG INFO ===');
 }
 
 // Function to process multiple columns for update operation
@@ -309,6 +363,11 @@ export const actionCRMFields: INodeProperties[] = [
 								value: 'references',
 								description: 'For agents, contacts, companies, subscriptions, orders, references columns',
 							},
+							{
+								name: 'Select',
+								value: 'select',
+								description: 'For select/dropdown columns with predefined options',
+							},
 						],
 						default: 'string',
 						description: 'Select the type of value you want to provide',
@@ -465,6 +524,23 @@ export const actionCRMFields: INodeProperties[] = [
 							},
 						},
 					},
+					// Select value
+					{
+						displayName: 'Select Value',
+						name: 'selectValue',
+						type: 'options',
+						typeOptions: {
+							loadOptionsMethod: 'getSelectColumnOptions',
+							loadOptionsDependsOn: ['boardId', 'columnName']
+						},
+						default: '',
+						description: 'Select a value from predefined options',
+						displayOptions: {
+							show: {
+								valueType: ['select'],
+							},
+						},
+					},
 				],
 			},
 		],
@@ -581,6 +657,11 @@ export const actionCRMFields: INodeProperties[] = [
 								name: 'References (UUIDs)',
 								value: 'references',
 								description: 'For agents, contacts, companies, subscriptions, orders, references columns',
+							},
+							{
+								name: 'Select',
+								value: 'select',
+								description: 'For select/dropdown columns with predefined options',
 							},
 						],
 						default: 'string',
@@ -735,6 +816,23 @@ export const actionCRMFields: INodeProperties[] = [
 						displayOptions: {
 							show: {
 								valueType: ['references'],
+							},
+						},
+					},
+					// Select value
+					{
+						displayName: 'Select Value',
+						name: 'selectValue',
+						type: 'options',
+						typeOptions: {
+							loadOptionsMethod: 'getSelectColumnOptions',
+							loadOptionsDependsOn: ['boardId', 'columnName']
+						},
+						default: '',
+						description: 'Select a value from predefined options',
+						displayOptions: {
+							show: {
+								valueType: ['select'],
 							},
 						},
 					},

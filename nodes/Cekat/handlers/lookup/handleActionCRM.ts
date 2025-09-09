@@ -11,25 +11,30 @@ export async function handleCreateItem(
 	const groupId = context.getNodeParameter('groupId', i, '') as string;
 	const itemName = context.getNodeParameter('itemName', i, '') as string;
 
-	// Ambil semua columns
-	const columns = context.getNodeParameter('columns', i, {}) as any;
+	// PERBAIKAN: Ambil pre-processed columns dari items[i].json
+	const inputData = context.getInputData();
+	const formattedColumns = inputData[i].json.formattedColumns as Record<string, any> || {};
 
-	// Gunakan helper biar format sesuai tipe
-	const columnData = processCreateItemColumns(columns.column || []);
+	console.log('=== CREATE ITEM DEBUG ===');
+	console.log('boardId:', boardId);
+	console.log('groupId:', groupId);
+	console.log('itemName:', itemName);
+	console.log('formattedColumns:', JSON.stringify(formattedColumns, null, 2));
 
-	console.log('columnData', columnData);
-
-	// Build request body
+	// Build request body dengan pre-processed data
 	const requestBody: any = {
-		...columnData,
+		...formattedColumns, // Gunakan data yang sudah diformat di execute()
 	};
 
+	// Tambahkan required fields
 	if (itemName) {
 		requestBody.item_name = itemName;
 	}
 	if (groupId) {
 		requestBody.group_id = groupId;
 	}
+
+	console.log('Final requestBody:', JSON.stringify(requestBody, null, 2));
 
 	const response = await cekatApiRequest.call(
 		context,
@@ -45,6 +50,9 @@ export async function handleCreateItem(
 			success: true,
 			operation: 'createItem',
 			boardId,
+			itemName,
+			groupId,
+			columnsCount: Object.keys(formattedColumns).length,
 			requestBody,
 			response,
 		},
@@ -59,44 +67,19 @@ export async function handleUpdateItem(
 	const boardId = context.getNodeParameter('boardId', i) as string;
 	const itemId = context.getNodeParameter('itemId', i) as string;
 
-	// Ambil semua columns dari fixedCollection
-	const columns = context.getNodeParameter('columns.column', i, []) as any[];
+	// PERBAIKAN: Ambil pre-processed columns dari items[i].json
+	const inputData = context.getInputData();
+	const formattedColumns = inputData[i].json.formattedColumns as Record<string, any> || {};
 
-	const requestBody: Record<string, any> = {};
+	console.log('=== UPDATE ITEM DEBUG ===');
+	console.log('boardId:', boardId);
+	console.log('itemId:', itemId);
+	console.log('formattedColumns:', JSON.stringify(formattedColumns, null, 2));
 
-	for (const col of columns) {
-		const columnName = col.columnName as string;
-		const valueType = col.valueType as string;
+	// Gunakan pre-processed data sebagai request body
+	const requestBody = { ...formattedColumns };
 
-		// Semua params yang mungkin dipakai helper
-		const params = {
-			stringValue: col.stringValue || '',
-			numberValue: col.numberValue || 0,
-			dropdownValues: col.dropdownValues || '',
-			timelineFrom: col.timelineFrom || '',
-			timelineTo: col.timelineTo || '',
-			files: col.files || {},
-			referenceIds: col.referenceIds || '',
-			agentIds: col.agentIds || [],
-			contactIds: col.contactIds || [],
-			companyIds: col.companyIds || [],
-			orderIds: col.orderIds || [],
-			subscriptionIds: col.subscriptionIds || [],
-			conversationValue: col.conversationValue || '',
-			textValue: col.textValue || '',
-			dateValue: col.dateValue || '',
-			emailValue: col.emailValue || '',
-			phoneValue: col.phoneValue || '',
-			longTextValue: col.longTextValue || '',
-			checkboxValue: col.checkboxValue || false,
-			selectValue: col.selectValue || '',
-		};
-
-		const formatted = processUpdateItemColumn(columnName, valueType, params);
-		Object.assign(requestBody, formatted);
-	}
-
-	console.log('requestBody', requestBody);
+	console.log('Final requestBody:', JSON.stringify(requestBody, null, 2));
 
 	const response = await cekatApiRequest.call(
 		context,
@@ -113,6 +96,7 @@ export async function handleUpdateItem(
 			operation: 'updateItem',
 			boardId,
 			itemId,
+			columnsCount: Object.keys(formattedColumns).length,
 			updatedFields: requestBody,
 			response,
 		},
@@ -120,7 +104,7 @@ export async function handleUpdateItem(
 	};
 }
 
-
+// Delete handler tetap sama karena tidak memerlukan column processing
 export async function handleDeleteItems(
 	context: IExecuteFunctions,
 	i: number,
