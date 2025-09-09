@@ -19,13 +19,22 @@ import {
 	handleGetBoard,
 	handleGetAllItems,
 	handleGetItem
-} from './lookup/handleLookupCRM';
+} from './crm/handleLookupCRM';
 // Import CRM action handlers
 import { 
 	handleCreateItem, 
 	handleDeleteItems, 
 	handleUpdateItem 
-} from './lookup/handleActionCRM'; // atau './action/handleActionCRM' sesuai struktur folder
+} from './crm/handleActionCRM'; // atau './action/handleActionCRM' sesuai struktur folder
+// Import Order lookup handlers
+import {
+	handleGetAllOrders,
+	handleGetOrder,
+} from './order/handleLookupOrder';
+// Import Order action handlers
+import { 
+	handleUpdateOrder,
+} from './order/handleActionOrder';
 
 export const handlers: Record<
 	string,
@@ -73,4 +82,11 @@ export const handlers: Record<
 	'action:createItem': handleCreateItem,
 	'action:updateItem': handleUpdateItem,
 	'action:deleteItems': handleDeleteItems,
+
+	// Order lookup operations
+	'lookup:getAllOrders': handleGetAllOrders,
+	'lookup:getOrder': handleGetOrder,
+	'lookup:updateOrder': handleUpdateOrder,
+
+	'action:updateOrder': handleUpdateOrder,
 };
