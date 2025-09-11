@@ -18,23 +18,14 @@ import {
 	handleGetAllBoards,
 	handleGetBoard,
 	handleGetAllItems,
-	handleGetItem
+	handleGetItem,
 } from './crm/handleLookupCRM';
 // Import CRM action handlers
-import { 
-	handleCreateItem, 
-	handleDeleteItems, 
-	handleUpdateItem 
-} from './crm/handleActionCRM'; // atau './action/handleActionCRM' sesuai struktur folder
+import { handleCreateItem, handleDeleteItems, handleUpdateItem } from './crm/handleActionCRM'; // atau './action/handleActionCRM' sesuai struktur folder
 // Import Order lookup handlers
-import {
-	handleGetAllOrders,
-	handleGetOrder,
-} from './order/handleLookupOrder';
+import { handleGetAllOrders, handleGetOrder } from './order/handleLookupOrder';
 // Import Order action handlers
-import { 
-	handleUpdateOrder,
-} from './order/handleActionOrder';
+import { handleCreateOrder, handleUpdateOrder } from './order/handleActionOrder';
 
 export const handlers: Record<
 	string,
@@ -43,14 +34,14 @@ export const handlers: Record<
 	// Message operations
 	'message:sendMessage': handleSendMessage,
 	'message:sendTemplateMessage': handleSendTemplateMessage,
-	
+
 	// Contact operations
 	'contact:updateAdditionalData': handleUpdateAdditionalData,
-	
+
 	// Webhook operations
 	'webhook:subscribe': handleSubscribeWebhook,
 	'webhook:unsubscribe': handleSubscribeWebhook,
-	
+
 	// Conversation operations
 	'conversation:setPipelineStatus': handleSetPipelineStatus,
 	'conversation:resolveConversation': handleResolveConversation,
@@ -61,7 +52,7 @@ export const handlers: Record<
 	'conversation:assignAgent': handleAssignAgent,
 	'conversation:addCollaborator': handleAddCollaborator,
 	'conversation:changeStageStatus': handleChangeStageStatus,
-	
+
 	// General lookup operations (existing)
 	'lookup:getMessages': handleLookup,
 	'lookup:getAllTemplates': handleLookup,
@@ -71,13 +62,13 @@ export const handlers: Record<
 	'lookup:getContact': handleLookup,
 	'lookup:getPipelineStatuses': handleLookup,
 	'lookup:getSubscribedWebhooks': handleLookup,
-	
+
 	// CRM lookup operations (✅ removed duplicates)
 	'lookup:getAllBoards': handleGetAllBoards,
 	'lookup:getBoard': handleGetBoard,
 	'lookup:getAllItems': handleGetAllItems,
 	'lookup:getItem': handleGetItem,
-	
+
 	// CRM action operations
 	'action:createItem': handleCreateItem,
 	'action:updateItem': handleUpdateItem,
@@ -88,5 +79,7 @@ export const handlers: Record<
 	'lookup:getOrder': handleGetOrder,
 	'lookup:updateOrder': handleUpdateOrder,
 
+	// Order action operations
 	'action:updateOrder': handleUpdateOrder,
+	'action:createOrder': handleCreateOrder,
 };
