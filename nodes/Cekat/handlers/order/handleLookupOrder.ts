@@ -5,14 +5,7 @@ export async function handleGetAllOrders(
 	context: IExecuteFunctions,
 	i: number,
 ): Promise<INodeExecutionData> {
-	const response = await cekatApiRequest.call(
-		context,
-		'GET',
-		'/api/orders',
-		{},
-		{},
-		'staging',
-	);
+	const response = await cekatApiRequest.call(context, 'GET', '/api/orders', {}, {}, 'server');
 
 	return {
 		json: {
@@ -36,7 +29,7 @@ export async function handleGetOrder(
 		`/api/orders/${orderId}`,
 		{},
 		{},
-		'staging',
+		'server',
 	);
 
 	return {
@@ -51,27 +44,27 @@ export async function handleGetOrder(
 }
 
 export async function handleUpdateOrder(
-    context: IExecuteFunctions,
-    i: number,
- ): Promise<INodeExecutionData> {
-    const orderId = context.getNodeParameter('orderId', i) as string;
+	context: IExecuteFunctions,
+	i: number,
+): Promise<INodeExecutionData> {
+	const orderId = context.getNodeParameter('orderId', i) as string;
 
-    const response = await cekatApiRequest.call(
-        context,
-        'PUT',
-        `/api/orders/${orderId}`,
-        {},
-        {},
-        'staging',
-    );  
+	const response = await cekatApiRequest.call(
+		context,
+		'PUT',
+		`/api/orders/${orderId}`,
+		{},
+		{},
+		'server',
+	);
 
-    return {
-        json: {
-            success: true,
-            operation: 'updateOrder',
-            orderId,
-            response,
-        },
-        pairedItem: i,
-    };  
- }
+	return {
+		json: {
+			success: true,
+			operation: 'updateOrder',
+			orderId,
+			response,
+		},
+		pairedItem: i,
+	};
+}

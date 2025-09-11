@@ -110,7 +110,7 @@ export class CekatOrderTrigger implements INodeType {
 					'/business_workflows/webhooks',
 					{},
 					{},
-					'staging',
+					'server',
 				);
 				return Array.isArray(res) && res.length > 0;
 			},
@@ -149,7 +149,7 @@ export class CekatOrderTrigger implements INodeType {
 					'/business_workflows/webhooks/subscribe',
 					payload,
 					{},
-					'staging',
+					'server',
 				);
 
 				return true;
@@ -164,7 +164,7 @@ export class CekatOrderTrigger implements INodeType {
 					'/business_workflows/webhooks/unsubscribe',
 					{ webhookUrl },
 					{},
-					'staging',
+					'server',
 				);
 
 				return true;

@@ -31,7 +31,7 @@ export async function handleUpdateOrder(
 		`/api/orders/${orderId}`,
 		requestBody,
 		{},
-		'staging',
+		'server',
 	);
 
 	return {
@@ -154,7 +154,7 @@ export async function handleCreateOrder(
 		'/api/orders',
 		requestBody,
 		{},
-		'staging',
+		'server',
 	);
 
 	return {

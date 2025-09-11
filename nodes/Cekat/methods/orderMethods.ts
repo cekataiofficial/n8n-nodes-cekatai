@@ -2,7 +2,7 @@ import { ILoadOptionsFunctions, INodePropertyOptions } from 'n8n-workflow';
 import { cekatApiRequest } from '../GenericFunctions';
 
 export async function getOrders(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-	const response = await cekatApiRequest.call(this, 'GET', '/api/orders', {}, {}, 'staging');
+	const response = await cekatApiRequest.call(this, 'GET', '/api/orders', {}, {}, 'server');
 
 	// Fix: Access orders array from response.data.orders, not response.data
 	const orders = response.data.orders || [];
