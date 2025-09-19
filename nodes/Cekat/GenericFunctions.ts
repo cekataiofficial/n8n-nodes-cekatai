@@ -7,7 +7,7 @@ const staging_url = 'https://staging-server.cekat.ai';
 // const server_url = 'http://localhost:3001';
 
 export async function cekatApiRequest(
-	this: IExecuteFunctions,
+	this: IExecuteFunctions | ILoadOptionsFunctions,
 	method: string,
 	endpoint: string,
 	body?: any,

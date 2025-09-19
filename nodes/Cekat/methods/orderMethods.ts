@@ -14,3 +14,30 @@ export async function getOrders(this: ILoadOptionsFunctions): Promise<INodePrope
 		value: order.id,
 	}));
 }
+
+export async function getContacts(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+	try {
+		const response = await cekatApiRequest.call(this, 'GET', '/api/contacts', {}, {}, 'server');
+		
+		console.log('getContacts response:', JSON.stringify(response, null, 2));
+		
+		// Handle different response structures
+		let contacts = [];
+		if (response.data && Array.isArray(response.data)) {
+			contacts = response.data;
+		} else if (response.data && response.data.contacts && Array.isArray(response.data.contacts)) {
+			contacts = response.data.contacts;
+		} else if (Array.isArray(response)) {
+			contacts = response;
+		}
+		
+		return contacts.map((contact: any) => ({
+			name: contact.display_name || contact.name || contact.phone_number || 'Unknown Contact',
+			value: contact.id,
+			description: contact.phone_number ? `Phone: ${contact.phone_number}` : undefined,
+		}));
+	} catch (error) {
+		console.error('Error in getContacts:', error);
+		return [];
+	}
+}

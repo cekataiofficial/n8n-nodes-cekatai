@@ -326,6 +326,37 @@ export const actionOrderFields: INodeProperties[] = [
 		},
 	},
 
+	// ========== NAME FIELD (Required) ==========
+	{
+		displayName: 'Name',
+		name: 'name',
+		type: 'string',
+		default: '',
+		required: true,
+		description: 'Customer name (required)',
+		displayOptions: {
+			show: {
+				resource: ['action'],
+				operation: ['createOrder'],
+			},
+		},
+	},
+
+	// ========== EMAIL FIELD (Optional) ==========
+	{
+		displayName: 'Email (Optional)',
+		name: 'email',
+		type: 'string',
+		default: '',
+		description: 'Customer email address (optional)',
+		displayOptions: {
+			show: {
+				resource: ['action'],
+				operation: ['createOrder'],
+			},
+		},
+	},
+
 	// ========== NOTES FIELD ==========
 	{
 		displayName: 'Notes',

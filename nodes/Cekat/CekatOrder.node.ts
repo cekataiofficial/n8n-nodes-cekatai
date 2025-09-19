@@ -55,6 +55,7 @@ export class CekatOrder implements INodeType {
 	methods = {
 		loadOptions: {
 			getOrders: options.getOrders,
+			getContacts: options.getContacts,
 		},
 	};
 

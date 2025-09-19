@@ -85,6 +85,8 @@ export async function handleCreateOrder(
 	const vat = context.getNodeParameter('vat', i, 0) as number;
 	const notes = context.getNodeParameter('notes', i, '') as string;
 	const address = context.getNodeParameter('address', i, '') as string;
+	const name = context.getNodeParameter('name', i, '') as string;
+	const email = context.getNodeParameter('email', i, '') as string;
 
 	// Conditional fields based on payment method
 	let bankAccountNumber = '';
@@ -130,12 +132,16 @@ export async function handleCreateOrder(
 	if (contactId) requestBody.contact_id = contactId;
 	if (phoneNumber) requestBody.phone_number = phoneNumber;
 
+	// Add required fields
+	requestBody.display_name = name;
+
 	// Add optional fields only if they have values
 	if (shippingFee > 0) requestBody.shipping_fee = shippingFee;
 	if (discount > 0) requestBody.discount = discount;
 	if (vat > 0) requestBody.vat = vat;
 	if (notes) requestBody.notes = notes;
 	if (address) requestBody.address = address;
+	if (email) requestBody.email = email;
 
 	// Add conditional fields
 	if (paymentMethod === 'manual' && bankAccountNumber) {
