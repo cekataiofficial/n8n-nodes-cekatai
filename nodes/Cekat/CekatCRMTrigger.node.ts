@@ -71,7 +71,6 @@ export class CekatCRMTrigger implements INodeType {
 					'GET',
 					'/business_workflows/webhooks',
 					{},
-					{},
 					'server',
 				);
 				return Array.isArray(res) && res.length > 0;

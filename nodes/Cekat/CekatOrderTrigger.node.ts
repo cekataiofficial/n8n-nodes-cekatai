@@ -149,7 +149,6 @@ export class CekatOrderTrigger implements INodeType {
 					'POST',
 					'/business_workflows/webhooks/subscribe',
 					payload,
-					{},
 					'server',
 				);
 
@@ -164,7 +163,6 @@ export class CekatOrderTrigger implements INodeType {
 					'POST',
 					'/business_workflows/webhooks/unsubscribe',
 					{ webhookUrl },
-					{},
 					'server',
 				);
 
