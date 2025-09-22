@@ -5,7 +5,7 @@ export async function handleGetAllOrders(
 	context: IExecuteFunctions,
 	i: number,
 ): Promise<INodeExecutionData> {
-	const response = await cekatApiRequest.call(context, 'GET', '/api/orders', {}, {}, 'staging');
+	const response = await cekatApiRequest.call(context, 'GET', '/api/orders', {}, {}, 'server');
 
 	return {
 		json: {
@@ -29,7 +29,7 @@ export async function handleGetOrder(
 		`/api/orders/${orderId}`,
 		{},
 		{},
-		'staging',
+		'server',
 	);
 
 	return {
@@ -55,7 +55,7 @@ export async function handleUpdateOrder(
 		`/api/orders/${orderId}`,
 		{},
 		{},
-		'staging',
+		'server',
 	);
 
 	return {
