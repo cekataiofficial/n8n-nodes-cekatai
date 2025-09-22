@@ -104,12 +104,13 @@ export class CekatOrderTrigger implements INodeType {
 	webhookMethods = {
 		default: {
 			async checkExists(this: ITriggerFunctions): Promise<boolean> {
+				const webhookUrl = this.getNodeWebhookUrl('default');
 				const res = await cekatApiRequest.call(
 					this,
 					'GET',
 					'/business_workflows/webhooks',
 					{},
-					{},
+					{ webhookUrl },
 					'server',
 				);
 				return Array.isArray(res) && res.length > 0;

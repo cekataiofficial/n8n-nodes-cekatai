@@ -1,5 +1,5 @@
 {
-	"name": "n8n-nodes-cekatai",
+	"name": "",
 	"version": "0.1.4",
 	"description": "Cekat AI nodes for n8n",
 	"keywords": [
@@ -38,7 +38,7 @@
 			"dist/nodes/Cekat/CekatTrigger.node.js",
 			"dist/nodes/Cekat/CekatAiToolTrigger.node.js",
 			"dist/nodes/Cekat/CekatOrder.node.js",
-			"dist/nodes/Cekat/CekatOrderTriger.node.js"
+			"dist/nodes/Cekat/CekatOrderTrigger.node.js"
 		]
 	},
 	"devDependencies": {
