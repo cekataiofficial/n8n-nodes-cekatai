@@ -1,7 +1,9 @@
 import type { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
 import { cekatApiRequest } from '../../GenericFunctions';
-import { formatColumnValue, processCreateItemColumns, processUpdateItemColumn } from '../../description/ActionCRMDescription';
-
+import {
+	formatColumnValue,
+	processCreateItemColumns,
+} from '../../description/ActionCRMDescription';
 
 export async function handleCreateItem(
 	context: IExecuteFunctions,
@@ -13,7 +15,7 @@ export async function handleCreateItem(
 
 	// PERBAIKAN: Ambil pre-processed columns dari items[i].json
 	const inputData = context.getInputData();
-	const formattedColumns = inputData[i].json.formattedColumns as Record<string, any> || {};
+	const formattedColumns = (inputData[i].json.formattedColumns as Record<string, any>) || {};
 
 	console.log('=== CREATE ITEM DEBUG ===');
 	console.log('boardId:', boardId);
@@ -69,7 +71,7 @@ export async function handleUpdateItem(
 
 	// PERBAIKAN: Ambil pre-processed columns dari items[i].json
 	const inputData = context.getInputData();
-	const formattedColumns = inputData[i].json.formattedColumns as Record<string, any> || {};
+	const formattedColumns = (inputData[i].json.formattedColumns as Record<string, any>) || {};
 
 	console.log('=== UPDATE ITEM DEBUG ===');
 	console.log('boardId:', boardId);

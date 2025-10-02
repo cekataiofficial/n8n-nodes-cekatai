@@ -175,14 +175,7 @@ export async function getInboxesDropdown(
 // CRM BOARDS - Updated dengan pattern existing
 export async function getBoards(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 	try {
-		const res = await cekatApiRequest.call(
-			this,
-			'GET',
-			'/api/crm/boards',
-			{},
-			{},
-			'server',
-		);
+		const res = await cekatApiRequest.call(this, 'GET', '/api/crm/boards', {}, {}, 'server');
 
 		console.log('getBoards response:', JSON.stringify(res, null, 2));
 
@@ -194,10 +187,12 @@ export async function getBoards(this: ILoadOptionsFunctions): Promise<INodePrope
 				}));
 			} else {
 				const board = res.data;
-				return [{
-					name: board.column_name ? `${board.name} (${board.column_name})` : board.name,
-					value: board.id,
-				}];
+				return [
+					{
+						name: board.column_name ? `${board.name} (${board.column_name})` : board.name,
+						value: board.id,
+					},
+				];
 			}
 		}
 
@@ -219,13 +214,13 @@ export async function getBoards(this: ILoadOptionsFunctions): Promise<INodePrope
 // CRM GROUPS - Load groups berdasarkan board
 export async function getGroups(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 	try {
-		const boardId = this.getNodeParameter('boardId', 0, '') as string;
-		
+		const boardId = this.getNodeParameter('boardId', 0) as string;
+
 		if (!boardId) {
 			console.log('getGroups called without boardId');
 			return [];
 		}
-		
+
 		const res = await cekatApiRequest.call(
 			this,
 			'GET',
@@ -234,9 +229,9 @@ export async function getGroups(this: ILoadOptionsFunctions): Promise<INodePrope
 			{},
 			'server',
 		);
-		
+
 		console.log('getGroups response for boardId:', boardId);
-		
+
 		if (res.message === 'success' && res.data?.crm_groups) {
 			return res.data.crm_groups.map((group: { id: string; name: string; color?: string }) => ({
 				name: group.name,
@@ -244,7 +239,7 @@ export async function getGroups(this: ILoadOptionsFunctions): Promise<INodePrope
 				description: group.color ? `Color: ${group.color}` : undefined,
 			}));
 		}
-		
+
 		return [];
 	} catch (error) {
 		console.error('Error in getGroups:', error);
@@ -255,13 +250,13 @@ export async function getGroups(this: ILoadOptionsFunctions): Promise<INodePrope
 // CRM ITEMS - Load items berdasarkan board
 export async function getItems(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 	try {
-		const boardId = this.getNodeParameter('boardId', 0, '') as string;
-		
+		const boardId = this.getNodeParameter('boardId', 0) as string;
+
 		if (!boardId) {
 			console.log('getItems called without boardId');
 			return [];
 		}
-		
+
 		const res = await cekatApiRequest.call(
 			this,
 			'GET',
@@ -270,23 +265,23 @@ export async function getItems(this: ILoadOptionsFunctions): Promise<INodeProper
 			{},
 			'server',
 		);
-		
+
 		console.log('getItems response:', JSON.stringify(res, null, 2));
-		
+
 		if (res.message === 'success' && Array.isArray(res.data)) {
 			return res.data.map((item: any) => ({
 				name: item.item_name || item.name || 'Unknown Item',
 				value: item.item_id || item.id,
 			}));
 		}
-		
+
 		if (Array.isArray(res)) {
 			return res.map((item: any) => ({
 				name: item.item_name || item.name || 'Unknown Item',
 				value: item.item_id || item.id,
 			}));
 		}
-		
+
 		console.log('No valid items found in response');
 		return [];
 	} catch (error) {
@@ -296,17 +291,19 @@ export async function getItems(this: ILoadOptionsFunctions): Promise<INodeProper
 }
 
 // DYNAMIC BOARD COLUMNS - Fungsi utama untuk dynamic fields
-export async function getBoardColumns(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+export async function getBoardColumns(
+	this: ILoadOptionsFunctions,
+): Promise<INodePropertyOptions[]> {
 	try {
-		const boardId = this.getNodeParameter('boardId', 0, '') as string;
-		
+		const boardId = this.getNodeParameter('boardId', 0) as string;
+
 		if (!boardId) {
 			console.log('getBoardColumns called without boardId');
 			return [];
 		}
-		
+
 		console.log('Getting columns for boardId:', boardId);
-		
+
 		const res = await cekatApiRequest.call(
 			this,
 			'GET',
@@ -315,34 +312,43 @@ export async function getBoardColumns(this: ILoadOptionsFunctions): Promise<INod
 			{},
 			'server',
 		);
-		
+
 		console.log('getBoardColumns response:', JSON.stringify(res, null, 2));
-		
+
 		if (res.message === 'success' && res.data?.crm_columns) {
 			return res.data.crm_columns
-	.filter((column: any) => !column.read_only && column.is_visible && column.type !== 'timeline')
-	.map((column: { id: string; name: string; type: string; settings?: any; is_required?: boolean }) => {
-		let displayName = column.name;
+				.filter(
+					(column: any) => !column.read_only && column.is_visible && column.type !== 'timeline',
+				)
+				.map(
+					(column: {
+						id: string;
+						name: string;
+						type: string;
+						settings?: any;
+						is_required?: boolean;
+					}) => {
+						let displayName = column.name;
 
-		if (column.type) {
-			displayName += ` (${column.type})`;
-		}
-		if (column.type === 'number' && column.settings?.unit) {
-			displayName += ` [${column.settings.unit}]`;
-		}
-		if (column.is_required) {
-			displayName += ' *';
+						if (column.type) {
+							displayName += ` (${column.type})`;
+						}
+						if (column.type === 'number' && column.settings?.unit) {
+							displayName += ` [${column.settings.unit}]`;
+						}
+						if (column.is_required) {
+							displayName += ' *';
+						}
+
+						return {
+							name: displayName,
+							value: column.name,
+							description: `Column: ${column.name} | Type: ${column.type}`,
+						};
+					},
+				);
 		}
 
-		return {
-			name: displayName,       
-			value: column.name,    
-			description: `Column: ${column.name} | Type: ${column.type}`,
-		};
-	});
-
-		}
-		
 		console.log('No valid columns found in response for boardId:', boardId);
 		return [];
 	} catch (error) {
@@ -352,12 +358,14 @@ export async function getBoardColumns(this: ILoadOptionsFunctions): Promise<INod
 }
 
 // Load stage options untuk dropdown Stage (jika ada)
-export async function getStageOptions(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+export async function getStageOptions(
+	this: ILoadOptionsFunctions,
+): Promise<INodePropertyOptions[]> {
 	try {
-		const boardId = this.getNodeParameter('boardId', 0, '') as string;
-		
+		const boardId = this.getNodeParameter('boardId', 0) as string;
+
 		if (!boardId) return [];
-		
+
 		const res = await cekatApiRequest.call(
 			this,
 			'GET',
@@ -366,10 +374,10 @@ export async function getStageOptions(this: ILoadOptionsFunctions): Promise<INod
 			{},
 			'server',
 		);
-		
+
 		if (res.message === 'success' && res.data?.crm_columns) {
-			const stageColumn = res.data.crm_columns.find((col: any) => 
-				col.name.toLowerCase().includes('stage') && col.type === 'select'
+			const stageColumn = res.data.crm_columns.find(
+				(col: any) => col.name.toLowerCase().includes('stage') && col.type === 'select',
 			);
 
 			if (stageColumn?.settings?.labels) {
@@ -390,23 +398,21 @@ export async function getStageOptions(this: ILoadOptionsFunctions): Promise<INod
 	}
 }
 
-
-
 export async function getSelectColumnOptions(
-	this: ILoadOptionsFunctions
+	this: ILoadOptionsFunctions,
 ): Promise<INodePropertyOptions[]> {
 	try {
-		const boardId = this.getNodeParameter('boardId', 0, '') as string;
-		
+		const boardId = this.getNodeParameter('boardId', 0) as string;
+
 		// Cara yang benar untuk mengakses columnName dari fixedCollection
 		let columnName = '';
-		
+
 		// Method 1: Coba akses dari parameter context
 		try {
 			// Dalam konteks loadOptions untuk fixedCollection, kita perlu mengakses dari collection yang sedang aktif
-			const columnsCollection = this.getNodeParameter('columns', 0, {}) as any;
+			const columnsCollection = this.getNodeParameter('columns', 0) as any;
 			console.log('Columns collection:', JSON.stringify(columnsCollection, null, 2));
-			
+
 			// Akses berdasarkan struktur fixedCollection: columns.column[index].columnName
 			if (columnsCollection.column && Array.isArray(columnsCollection.column)) {
 				// Ambil dari row terakhir yang sedang di-edit (biasanya yang paling baru)
@@ -418,22 +424,22 @@ export async function getSelectColumnOptions(
 		} catch (error) {
 			console.log('Method 1 failed, trying alternative approach:', error.message);
 		}
-		
+
 		// Method 2: Jika masih kosong, coba dengan cara yang berbeda
 		if (!columnName) {
 			try {
 				// Coba akses langsung dengan path
-				columnName = this.getNodeParameter('columns.column.columnName', 0, '') as string;
+				columnName = this.getNodeParameter('columns.column.columnName', 0) as string;
 			} catch (error) {
 				console.log('Method 2 failed:', error.message);
 			}
 		}
-		
+
 		// Method 3: Fallback - ambil dari node parameters secara manual
 		if (!columnName) {
 			try {
-				const allParams = this.getNode().parameters;
-				console.log('All node parameters:', JSON.stringify(allParams, null, 2));
+				// const allParams = this.getNode().parameters;
+				// console.log('All node parameters:', JSON.stringify(allParams, null, 2));
 				// Implementasi manual parsing jika diperlukan
 			} catch (error) {
 				console.log('Method 3 failed:', error.message);
@@ -458,10 +464,10 @@ export async function getSelectColumnOptions(
 		// Panggil API dengan endpoint dan body yang benar
 		const res = await cekatApiRequest.call(
 			this,
-			'POST',  // Gunakan POST sesuai dengan API spec
+			'POST', // Gunakan POST sesuai dengan API spec
 			`/api/crm/boards/${boardId}/columns/by-name`,
 			{
-				name: columnName  // Body request berisi nama kolom
+				name: columnName, // Body request berisi nama kolom
 			},
 			{}, // Query parameters kosong
 			'server',
@@ -482,10 +488,9 @@ export async function getSelectColumnOptions(
 
 		console.log('No valid labels found in response');
 		return [];
-
 	} catch (error) {
 		console.error('Error in getSelectColumnOptions:', error);
-		
+
 		// Return fallback options untuk development/testing
 		return [
 			{ name: 'Kontak Pribadi', value: '1' },
@@ -502,23 +507,23 @@ export async function getSelectColumnOptions(
 
 // TAMBAHAN: Function untuk debug parameter access
 export async function debugParameterAccess(
-	this: ILoadOptionsFunctions
+	this: ILoadOptionsFunctions,
 ): Promise<INodePropertyOptions[]> {
 	try {
 		console.log('=== DEBUG PARAMETER ACCESS ===');
-		
+
 		// Method 1: Get all available parameters
 		const allParams = this.getNode().parameters;
 		console.log('All node parameters:', JSON.stringify(allParams, null, 2));
-		
+
 		// Method 2: Try different ways to access columns
 		const methods = [
-			() => this.getNodeParameter('columns', 0, {}),
-			() => this.getNodeParameter('columns.column', 0, []),
-			() => this.getNodeParameter('columns.column.0', 0, {}),
-			() => this.getNodeParameter('columns.column.0.columnName', 0, ''),
+			() => this.getNodeParameter('columns', 0),
+			() => this.getNodeParameter('columns.column', 0),
+			() => this.getNodeParameter('columns.column.0', 0),
+			() => this.getNodeParameter('columns.column.0.columnName', 0),
 		];
-		
+
 		methods.forEach((method, index) => {
 			try {
 				const result = method();
@@ -527,9 +532,8 @@ export async function debugParameterAccess(
 				console.log(`Method ${index + 1} failed:`, error.message);
 			}
 		});
-		
+
 		return [{ name: 'Debug Complete - Check Console', value: 'debug' }];
-		
 	} catch (error) {
 		console.error('Debug error:', error);
 		return [{ name: 'Debug Error', value: 'error' }];
@@ -540,11 +544,11 @@ export async function debugParameterAccess(
 // Buat function yang mengembalikan semua select options dari semua kolom select di board
 
 export async function getAllSelectColumnOptions(
-	this: ILoadOptionsFunctions
+	this: ILoadOptionsFunctions,
 ): Promise<INodePropertyOptions[]> {
 	try {
-		const boardId = this.getNodeParameter('boardId', 0, '') as string;
-		
+		const boardId = this.getNodeParameter('boardId', 0) as string;
+
 		if (!boardId) {
 			return [];
 		}
@@ -567,7 +571,7 @@ export async function getAllSelectColumnOptions(
 
 		// 2. Filter hanya kolom dengan type 'select'
 		const selectColumns = boardRes.data.crm_columns.filter(
-			(col: any) => col.type === 'select' && !col.read_only && col.is_visible
+			(col: any) => col.type === 'select' && !col.read_only && col.is_visible,
 		);
 
 		console.log('Found select columns:', selectColumns.length);
@@ -583,7 +587,7 @@ export async function getAllSelectColumnOptions(
 					'POST',
 					`/api/crm/boards/${boardId}/columns/by-name`,
 					{
-						name: column.name
+						name: column.name,
 					},
 					{},
 					'server',
@@ -597,7 +601,7 @@ export async function getAllSelectColumnOptions(
 							value: `${column.name}|${label.id}`, // Encode column name dan value
 							description: `Column: ${column.name} | Option: ${label.name}`,
 						}));
-					
+
 					allOptions.push(...options);
 				}
 			} catch (error) {
@@ -607,7 +611,6 @@ export async function getAllSelectColumnOptions(
 
 		console.log('Total select options found:', allOptions.length);
 		return allOptions;
-
 	} catch (error) {
 		console.error('Error in getAllSelectColumnOptions:', error);
 		return [];
@@ -616,11 +619,11 @@ export async function getAllSelectColumnOptions(
 
 // ATAU: Pendekatan dengan predefined mapping
 export async function getPredefinedSelectOptions(
-	this: ILoadOptionsFunctions
+	this: ILoadOptionsFunctions,
 ): Promise<INodePropertyOptions[]> {
 	try {
-		const boardId = this.getNodeParameter('boardId', 0, '') as string;
-		
+		// const boardId = this.getNodeParameter('boardId', 0) as string;
+
 		// Mapping kolom select yang umum digunakan
 		const commonSelectOptions: { [key: string]: INodePropertyOptions[] } = {
 			'Source Data': [
@@ -633,12 +636,12 @@ export async function getPredefinedSelectOptions(
 				{ name: 'OLX', value: '7' },
 				{ name: 'Altius', value: '8' },
 			],
-			'Status': [
+			Status: [
 				{ name: 'New', value: 'new' },
 				{ name: 'In Progress', value: 'progress' },
 				{ name: 'Completed', value: 'completed' },
 			],
-			'Priority': [
+			Priority: [
 				{ name: 'Low', value: 'low' },
 				{ name: 'Medium', value: 'medium' },
 				{ name: 'High', value: 'high' },
@@ -648,7 +651,7 @@ export async function getPredefinedSelectOptions(
 		// Return semua options yang tersedia
 		const allOptions: INodePropertyOptions[] = [];
 		Object.entries(commonSelectOptions).forEach(([columnName, options]) => {
-			const prefixedOptions = options.map(opt => ({
+			const prefixedOptions = options.map((opt) => ({
 				...opt,
 				name: `${columnName}: ${opt.name}`,
 				value: `${columnName}|${opt.value}`,
@@ -657,7 +660,6 @@ export async function getPredefinedSelectOptions(
 		});
 
 		return allOptions;
-
 	} catch (error) {
 		console.error('Error in getPredefinedSelectOptions:', error);
 		return [];

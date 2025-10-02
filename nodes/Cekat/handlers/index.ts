@@ -19,6 +19,7 @@ import {
 	handleGetBoard,
 	handleGetAllItems,
 	handleGetItem,
+	handleSearchItems,
 } from './crm/handleLookupCRM';
 // Import CRM action handlers
 import { handleCreateItem, handleDeleteItems, handleUpdateItem } from './crm/handleActionCRM'; // atau './action/handleActionCRM' sesuai struktur folder
@@ -68,6 +69,7 @@ export const handlers: Record<
 	'lookup:getBoard': handleGetBoard,
 	'lookup:getAllItems': handleGetAllItems,
 	'lookup:getItem': handleGetItem,
+	'lookup:searchItems': handleSearchItems,
 
 	// CRM action operations
 	'action:createItem': handleCreateItem,
