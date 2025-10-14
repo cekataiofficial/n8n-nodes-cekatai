@@ -152,7 +152,7 @@ export const messageFields: INodeProperties[] = [
 			},
 		},
 	},
-	
+
 	// ===== BUTTON INPUT METHOD SELECTION =====
 	{
 		displayName: 'Button Input Method',
@@ -181,7 +181,7 @@ export const messageFields: INodeProperties[] = [
 			},
 		},
 	},
-	
+
 	// ===== LIST INPUT METHOD SELECTION =====
 	{
 		displayName: 'List Input Method',
@@ -281,7 +281,7 @@ export const messageFields: INodeProperties[] = [
 		],
 		description: 'Add up to 3 reply buttons',
 	},
-	
+
 	// ===== DYNAMIC BUTTON ENTRY (NEW) =====
 	{
 		displayName: 'Dynamic Buttons (JSON)',
@@ -302,14 +302,14 @@ export const messageFields: INodeProperties[] = [
 			},
 		},
 	},
-	
+
 	// ===== DYNAMIC BUTTON EXPRESSION HELPER =====
 	{
 		displayName: '💡 Dynamic Button Examples',
 		name: 'dynamicButtonExamples',
 		type: 'notice',
 		default: '',
-		description: `		
+		description: `
 Contoh penggunaan dynamic buttons:
 
 🔘 Dari node sebelumnya:
@@ -423,7 +423,7 @@ Contoh penggunaan dynamic buttons:
 		],
 		description: 'Group your list options into sections',
 	},
-	
+
 	// ===== DYNAMIC LIST ENTRY (NEW) =====
 	{
 		displayName: '📋 List - Button Text',
@@ -445,7 +445,8 @@ Contoh penggunaan dynamic buttons:
 		displayName: 'Dynamic List Sections (JSON)',
 		name: 'dynamicSections',
 		type: 'string',
-		default: '[{"title":"Menu","rows":[{"id":"item1","title":"Item 1","description":"Deskripsi item 1"}]}]',
+		default:
+			'[{"title":"Menu","rows":[{"id":"item1","title":"Item 1","description":"Deskripsi item 1"}]}]',
 		typeOptions: {
 			rows: 6,
 		},
@@ -460,7 +461,7 @@ Contoh penggunaan dynamic buttons:
 			},
 		},
 	},
-	
+
 	// ===== DYNAMIC LIST EXPRESSION HELPER =====
 	{
 		displayName: '💡 Dynamic List Examples',
@@ -603,7 +604,7 @@ export const templateFields: INodeProperties[] = [
 		},
 		default: '',
 		required: true,
-		description: 'Select the template to send',
+		description: 'Select the template to send (filtered by selected inbox)',
 		displayOptions: {
 			show: {
 				resource: ['message'],
@@ -640,6 +641,32 @@ export const templateFields: INodeProperties[] = [
 		},
 	},
 
+	{
+		displayName: '📌 Note: File URL must end with a file name (e.g. `.jpg`, `.png`, `.pdf`, etc.)',
+		name: 'fileUrlNotice',
+		type: 'notice',
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: ['sendTemplateMessage'],
+			},
+		},
+	},
+	{
+		displayName: 'File URL',
+		name: 'fileUrl',
+		type: 'string',
+		default: '',
+		placeholder: 'https://example.com/file.jpg',
+		description: 'The URL of the file to send. The URL must include a file name at the end.',
+		displayOptions: {
+			show: {
+				resource: ['message'],
+				operation: ['sendTemplateMessage'],
+			},
+		},
+	},
 	{
 		displayName: 'Body Variables',
 		name: 'bodyVariables',

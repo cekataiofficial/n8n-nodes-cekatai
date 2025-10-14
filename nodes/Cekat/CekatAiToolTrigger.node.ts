@@ -1,9 +1,9 @@
 import {
-	ITriggerFunctions,
 	INodeType,
 	INodeTypeDescription,
 	IWebhookFunctions,
 	INodeExecutionData,
+	IHookFunctions,
 } from 'n8n-workflow';
 
 import * as options from '../Cekat/methods';
@@ -176,11 +176,11 @@ export class CekatAiToolTrigger implements INodeType {
 
 	webhookMethods = {
 		default: {
-			async checkExists(this: ITriggerFunctions): Promise<boolean> {
+			async checkExists(this: IHookFunctions): Promise<boolean> {
 				return false;
 			},
 
-			async create(this: ITriggerFunctions): Promise<boolean> {
+			async create(this: IHookFunctions): Promise<boolean> {
 				const agentIds = this.getNodeParameter('agentIds') as string[];
 				const name = this.getNodeParameter('toolName') as string;
 				const description = this.getNodeParameter('toolDescription') as string;
@@ -192,8 +192,8 @@ export class CekatAiToolTrigger implements INodeType {
 					`Creating webhook for workflow ID: ${workflowId}, Agents: ${agentIds.join(', ')}`,
 				);
 
-				const formattedInputs = aiInputsRaw.input
-					? aiInputsRaw.input.map((input: any) => {
+				const formattedInputs = (aiInputsRaw as any).input
+					? (aiInputsRaw as any).input.map((input: any) => {
 							return {
 								...input,
 								enum: input.enum?.values?.map((v: any) => v.value) || undefined,
@@ -203,7 +203,7 @@ export class CekatAiToolTrigger implements INodeType {
 
 				// Hit API
 				const res = await cekatApiRequest.call(
-					this,
+					this as any,
 					'POST',
 					'/business_workflows/ai-tools/create',
 					{
@@ -221,11 +221,11 @@ export class CekatAiToolTrigger implements INodeType {
 				return true;
 			},
 
-			async delete(this: ITriggerFunctions): Promise<boolean> {
+			async delete(this: IHookFunctions): Promise<boolean> {
 				const webhookUrl = this.getNodeWebhookUrl('default');
 
 				await cekatApiRequest.call(
-					this,
+					this as any,
 					'POST',
 					'/business_workflows/ai-tools/delete',
 					{ webhook_url: webhookUrl },
