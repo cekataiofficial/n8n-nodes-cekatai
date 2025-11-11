@@ -26,7 +26,7 @@ export async function cekatApiRequest(
 		uri: `${urlType === 'server' ? server_url + endpoint : api_url + endpoint}`,
 		json: true,
 	} as IRequestOptions;
-	if(urlType === 'staging') {
+	if (urlType === 'staging') {
 		options.uri = `${staging_url + endpoint}`;
 	}
 	return this.helpers.request(options);

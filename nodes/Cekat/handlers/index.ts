@@ -8,6 +8,7 @@ import { handleSetPipelineStatus } from './conversation/assignPipeline';
 import { handleAssignLabel } from './conversation/assignLabel';
 import { handleRemoveLabel } from './conversation/removeLabel';
 import { handleAssignAgent } from './conversation/assignAgent';
+import { handleAssignAiAgent } from './conversation/assignAiAgent';
 import { handleAddCollaborator } from './conversation/addCollaborator';
 import { handleChangeStageStatus } from './conversation/changeStageStatus';
 import { handleResolveConversation } from './conversation/resolve';
@@ -51,6 +52,7 @@ export const handlers: Record<
 	'conversation:assignLabel': handleAssignLabel,
 	'conversation:removeLabel': handleRemoveLabel,
 	'conversation:assignAgent': handleAssignAgent,
+	'conversation:assignAiAgent': handleAssignAiAgent,
 	'conversation:addCollaborator': handleAddCollaborator,
 	'conversation:changeStageStatus': handleChangeStageStatus,
 
