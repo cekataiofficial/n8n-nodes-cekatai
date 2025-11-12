@@ -76,6 +76,11 @@ export const conversationOperation: INodeProperties[] = [
 				value: 'unblockAI',
 				action: 'Unblock the AI from a conversation',
 			},
+			{
+				name: 'Assign AI Agent',
+				value: 'assignAiAgent',
+				action: 'Assign the ai agent to conversation',
+			},
 		],
 		default: 'assignAgent',
 	},
@@ -84,6 +89,37 @@ export const conversationOperation: INodeProperties[] = [
 export const conversationFields: INodeProperties[] = [
 	// 📌 Digunakan oleh SEMUA operation
 
+	{
+		displayName: 'Choose AI Agent',
+		name: 'agentId',
+		type: 'options',
+		typeOptions: {
+			loadOptionsMethod: 'getAIAgentsDropdown',
+		},
+		displayOptions: {
+			show: {
+				resource: ['conversation'],
+				operation: ['assignAiAgent'],
+			},
+		},
+		required: true,
+		default: '',
+		description: 'Select an AI agent to assign to the conversation',
+	},
+	{
+		displayName: 'Keep Assigned Ai Agent on Resolve',
+		name: 'keepAssigned',
+		type: 'boolean',
+		displayOptions: {
+			show: {
+				resource: ['conversation'],
+				operation: ['assignAiAgent'],
+			},
+		},
+		required: true,
+		default: false,
+		description: 'Select True or False for Keep Assigned Ai Agent when Resolve',
+	},
 	// 📌 assignAgent & addCollaborator
 	{
 		displayName: 'Select Agent or Agent ID',
@@ -225,6 +261,7 @@ export const conversationFields: INodeProperties[] = [
 					'blockAI',
 					'unblockAI',
 					'removeLabel',
+					'assignAiAgent',
 				],
 			},
 		},
