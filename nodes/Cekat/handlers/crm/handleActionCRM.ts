@@ -1,9 +1,6 @@
 import type { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
 import { cekatApiRequest } from '../../GenericFunctions';
-import {
-	formatColumnValue,
-	processCreateItemColumns,
-} from '../../description/ActionCRMDescription';
+// import { processCreateItemColumns } from '../../description/ActionCRMDescription';
 
 export async function handleCreateItem(
 	context: IExecuteFunctions,

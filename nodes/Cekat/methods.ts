@@ -62,18 +62,26 @@ export async function getTemplates(this: ILoadOptionsFunctions): Promise<INodePr
 	if (!credentials || !credentials.apiKey) {
 		throw new Error('No Cekat API Key credentials found!');
 	}
-	const apiKey = credentials.apiKey as string;
 
-	const inboxId = this.getNodeParameter('inboxId') as string;
+	// Get inboxId from current node parameters
+	const inboxId = this.getCurrentNodeParameter('inboxId') as string;
+
+	if (!inboxId) {
+		return [];
+	}
+
+	console.log('Getting templates for inboxId:', inboxId);
 
 	const data = await cekatApiRequest.call(
 		this,
 		'GET',
 		'/templates',
+		{},
 		{ inbox_id: inboxId },
-		{ api_key: apiKey },
 		'api',
 	);
+
+	console.log('Templates response:', data);
 
 	return data.data.map((template: { id: string; name: string }) => ({
 		name: template.name,

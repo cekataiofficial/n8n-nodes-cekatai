@@ -7,7 +7,7 @@ export async function handleChangeStageStatus(
 ): Promise<INodeExecutionData> {
 	const conversationId = context.getNodeParameter('conversationId', i) as string;
 	const stage_status = context.getNodeParameter('stage_status', i) as string;
-	const credentials = await context.getCredentials('CekatOpenApi');
+	// const credentials = await context.getCredentials('CekatOpenApi');
 
 	const body = {
 		conversation_id: conversationId,

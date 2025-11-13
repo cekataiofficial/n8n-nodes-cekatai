@@ -88,6 +88,37 @@ export const conversationOperation: INodeProperties[] = [
 
 export const conversationFields: INodeProperties[] = [
 	// 📌 Digunakan oleh SEMUA operation
+	{
+		displayName: 'Choose AI Agent',
+		name: 'agentId',
+		type: 'options',
+		typeOptions: {
+			loadOptionsMethod: 'getAIAgentsDropdown',
+		},
+		displayOptions: {
+			show: {
+				resource: ['conversation'],
+				operation: ['assignAiAgent'],
+			},
+		},
+		required: true,
+		default: '',
+		description: 'Select an AI agent to assign to the conversation',
+	},
+	{
+		displayName: 'Keep Assigned Ai Agent on Resolve',
+		name: 'keepAssigned',
+		type: 'boolean',
+		displayOptions: {
+			show: {
+				resource: ['conversation'],
+				operation: ['assignAiAgent'],
+			},
+		},
+		required: true,
+		default: [],
+		description: 'Select True or False for Keep Assigned Ai Agent when Resolve',
+	},
 
 	{
 		displayName: 'Choose AI Agent',

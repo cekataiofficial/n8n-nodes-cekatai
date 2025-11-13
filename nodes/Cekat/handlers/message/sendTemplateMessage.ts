@@ -8,6 +8,7 @@ export async function handleSendTemplateMessage(
 	const inboxId = context.getNodeParameter('inboxId', i) as string;
 	const receiverName = context.getNodeParameter('receiverName', i) as string;
 	const receiverPhoneNumber = context.getNodeParameter('receiverPhoneNumber', i) as string;
+	const fileUrl = context.getNodeParameter('fileUrl', i, '') as string;
 
 	const templateId = context.getNodeParameter('templateId', i);
 
@@ -33,7 +34,7 @@ export async function handleSendTemplateMessage(
 		? bodyVarsRaw.variable.map((v) => v.value)
 		: [];
 
-	const body = {
+	const body: any = {
 		inbox_id: inboxId,
 		wa_template_id: whatsappTemplateId,
 		// "otp_code": "552345", //max 15 char for auth only
@@ -41,6 +42,11 @@ export async function handleSendTemplateMessage(
 		phone_number: receiverPhoneNumber,
 		phone_name: receiverName,
 	};
+
+	// Add file_url if provided
+	if (fileUrl && fileUrl.trim() !== '') {
+		body.file_url = fileUrl.trim();
+	}
 
 	const response = await cekatApiRequest.call(context, 'POST', '/templates/send', body, {}, 'api');
 

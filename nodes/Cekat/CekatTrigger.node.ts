@@ -1,9 +1,4 @@
-import {
-	ITriggerFunctions,
-	INodeType,
-	INodeTypeDescription,
-	IWebhookFunctions,
-} from 'n8n-workflow';
+import { INodeType, INodeTypeDescription, IWebhookFunctions, IHookFunctions } from 'n8n-workflow';
 import { cekatApiRequest } from '../Cekat/GenericFunctions';
 import * as options from '../Cekat/methods';
 
@@ -68,13 +63,13 @@ export class CekatTrigger implements INodeType {
 
 	webhookMethods = {
 		default: {
-			async checkExists(this: ITriggerFunctions): Promise<boolean> {
+			async checkExists(this: IHookFunctions): Promise<boolean> {
 				const webhookUrl = this.getNodeWebhookUrl('default');
-				const events = this.getNodeParameter('events') as string[];
+				// const events = this.getNodeParameter('events') as string[];
 				const inboxId = this.getNodeParameter('inbox_id', '') as string;
 
 				const res = await cekatApiRequest.call(
-					this,
+					this as any,
 					'GET',
 					'/business_workflows/webhooks',
 					{},
@@ -85,13 +80,13 @@ export class CekatTrigger implements INodeType {
 				return Array.isArray(res) && res.length > 0;
 			},
 
-			async create(this: ITriggerFunctions): Promise<boolean> {
+			async create(this: IHookFunctions): Promise<boolean> {
 				const events = this.getNodeParameter('events') as string[];
 				const webhookUrl = this.getNodeWebhookUrl('default');
 				const inboxId = this.getNodeParameter('inbox_id', '') as string;
 
 				await cekatApiRequest.call(
-					this,
+					this as any,
 					'POST',
 					'/business_workflows/webhooks/subscribe',
 					{ events, webhookUrl, inboxId },
@@ -101,13 +96,13 @@ export class CekatTrigger implements INodeType {
 				return true;
 			},
 
-			async delete(this: ITriggerFunctions): Promise<boolean> {
+			async delete(this: IHookFunctions): Promise<boolean> {
 				const events = this.getNodeParameter('events') as string[];
 				const webhookUrl = this.getNodeWebhookUrl('default');
 				const inboxId = this.getNodeParameter('inbox_id', '') as string;
 
 				await cekatApiRequest.call(
-					this,
+					this as any,
 					'POST',
 					'/business_workflows/webhooks/unsubscribe',
 					{ events, webhookUrl, inboxId },

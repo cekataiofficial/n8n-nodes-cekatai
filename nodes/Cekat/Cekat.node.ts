@@ -5,7 +5,7 @@ import {
 	INodeTypeDescription,
 } from 'n8n-workflow';
 
-import { cekatApiRequest } from './GenericFunctions';
+// import { cekatApiRequest } from './GenericFunctions';
 import { messageOperations, messageFields, templateFields } from './description/MessageDescription';
 
 import * as options from './methods';
