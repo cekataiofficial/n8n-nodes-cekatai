@@ -32,7 +32,10 @@
 	"n8n": {
 		"n8nNodesApiVersion": 2,
 		"credentials": [
-			"dist/credentials/CekatOpenApi.credentials.js"
+			"dist/credentials/CekatOpenApi.credentials.js",
+			"dist/credentials/PowerBiApi.credentials.js",
+			"dist/credentials/PowerBiApiOAuth2Api.credentials.js",
+			"dist/credentials/PdforgeApi.credentials.js"
 		],
 		"nodes": [
 			"dist/nodes/Cekat/Cekat.node.js",
@@ -41,7 +44,9 @@
 			"dist/nodes/Cekat/CekatCRM.node.js",
 			"dist/nodes/Cekat/CekatCRMTrigger.node.js",
 			"dist/nodes/Cekat/CekatOrder.node.js",
-			"dist/nodes/Cekat/CekatOrderTrigger.node.js"
+			"dist/nodes/Cekat/CekatOrderTrigger.node.js",
+			"dist/nodes/PowerBI/PowerBI.node.js",
+			"dist/nodes/Pdforge/Pdforge.node.js"
 		]
 	},
 	"devDependencies": {

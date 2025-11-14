@@ -5,6 +5,8 @@ import { CekatCRM } from './nodes/Cekat/CekatCRM.node';
 import { CekatCRMTrigger } from './nodes/Cekat/CekatCRMTrigger.node';
 import { CekatOrder } from './nodes/Cekat/CekatOrder.node';
 import { CekatOrderTrigger } from './nodes/Cekat/CekatOrderTrigger.node';
+import { PowerBi } from './nodes/PowerBI/PowerBI.node';
+import { Pdforge } from './nodes/Pdforge/Pdforge.node';
 
 module.exports = {
 	Cekat,
@@ -14,4 +16,6 @@ module.exports = {
 	CekatCRMTrigger,
 	CekatOrder,
 	CekatOrderTrigger,
+	PowerBi,
+	Pdforge,
 };
