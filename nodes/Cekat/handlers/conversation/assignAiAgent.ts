@@ -15,7 +15,7 @@ export async function handleAssignAiAgent(
 	const response = await cekatApiRequest.call(
 		context,
 		'PUT',
-		`/api/conversation/${conversationId}`,
+		`/api/conversations/${conversationId}`,
 		body,
 		{},
 		'server',
