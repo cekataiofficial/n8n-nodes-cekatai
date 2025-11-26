@@ -45,8 +45,7 @@
 			"dist/nodes/Cekat/CekatCRMTrigger.node.js",
 			"dist/nodes/Cekat/CekatOrder.node.js",
 			"dist/nodes/Cekat/CekatOrderTrigger.node.js",
-			"dist/nodes/PowerBI/PowerBI.node.js",
-			"dist/nodes/Pdforge/Pdforge.node.js"
+			"dist/nodes/Cekat/CekatAiAgent.node.js"
 		]
 	},
 	"devDependencies": {

@@ -5,8 +5,6 @@ const { CekatCRM } = require('./dist/nodes/Cekat/CekatCRM.node.js');
 const { CekatCRMTrigger } = require('./dist/nodes/Cekat/CekatCRMTrigger.node.js');
 const { CekatOrder } = require('./dist/nodes/Cekat/CekatOrder.node.js');
 const { CekatOrderTrigger } = require('./dist/nodes/Cekat/CekatOrderTrigger.node.js');
-const { PowerBi } = require('./dist/nodes/PowerBI/PowerBI.node.js');
-const { Pdforge } = require('./dist/nodes/Pdforge/Pdforge.node.js');
 
 module.exports = {
 	Cekat,
@@ -16,6 +14,4 @@ module.exports = {
 	CekatCRMTrigger,
 	CekatOrder,
 	CekatOrderTrigger,
-	PowerBi,
-	Pdforge,
 };
