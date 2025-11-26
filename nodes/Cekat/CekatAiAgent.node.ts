@@ -40,89 +40,17 @@ export class CekatAiAgent implements INodeType {
 			{
 				displayName: 'Messages',
 				name: 'messages',
-				type: 'collection',
-				typeOptions: {
-					multipleValues: true,
-				},
-				default: {},
-				description: 'Tambahkan beberapa pesan dengan form yang rapi',
-				options: [
-					{
-						displayName: 'Message',
-						name: 'messageItem',
-						values: [
-							{
-								displayName: 'ID',
-								name: 'id',
-								type: 'number',
-								default: 1,
-							},
-							{
-								displayName: 'Message',
-								name: 'message',
-								type: 'string',
-								default: '',
-							},
-							{
-								displayName: 'Sent By',
-								name: 'sent_by_type',
-								type: 'options',
-								options: [
-									{ name: 'User', value: 'user' },
-									{ name: 'AI', value: 'ai' },
-								],
-								default: 'user',
-							},
-							{
-								displayName: 'Type',
-								name: 'type',
-								type: 'options',
-								options: [
-									{ name: 'Text', value: 'text' },
-									{ name: 'Image', value: 'image' },
-									{ name: 'Audio', value: 'audio' },
-									{ name: 'Video', value: 'video' },
-									{ name: 'File', value: 'file' },
-								],
-								default: 'text',
-							},
-							{
-								displayName: 'Media URL',
-								name: 'media_url',
-								type: 'string',
-								default: '',
-								displayOptions: {
-									show: {
-										type: ['image', 'audio', 'video', 'file'],
-									},
-								},
-							},
-							{
-								displayName: 'Media Type',
-								name: 'media_type',
-								type: 'options',
-								options: [
-									{ name: 'Image', value: 'image' },
-									{ name: 'Audio', value: 'audio' },
-									{ name: 'Video', value: 'video' },
-									{ name: 'File', value: 'file' },
-								],
-								default: 'image',
-								displayOptions: {
-									show: {
-										type: ['image', 'audio', 'video', 'file'],
-									},
-								},
-							},
-							{
-								displayName: 'Created At',
-								name: 'created_at',
-								type: 'dateTime',
-								default: '',
-							},
-						],
-					},
-				],
+				type: 'json',
+				default: `[
+		  {
+		    "id": 1,
+		    "message": "hi",
+		    "sent_by_type": "user",
+		    "created_at": "2025-10-23T08:49:40.781Z"
+		  }
+		]`,
+				required: true,
+				description: 'Array of message objects to send to the AI agent',
 			},
 		],
 	};
@@ -139,21 +67,12 @@ export class CekatAiAgent implements INodeType {
 
 		for (let i = 0; i < items.length; i++) {
 			const aiAgentId = this.getNodeParameter('ai_agent_id', i) as string;
-			const messagesParam = this.getNodeParameter('messages', i) as unknown as any;
-
+			const messagesParam = this.getNodeParameter('messages', i) as string | any[];
 			let messages: any[] = [];
 			if (typeof messagesParam === 'string') {
 				messages = JSON.parse(messagesParam);
-			} else if (Array.isArray(messagesParam)) {
-				messages = messagesParam;
-			} else if (
-				messagesParam &&
-				messagesParam.messageItem &&
-				Array.isArray(messagesParam.messageItem)
-			) {
-				messages = messagesParam.messageItem;
 			} else {
-				messages = [messagesParam];
+				messages = messagesParam as any[];
 			}
 
 			const body = {
