@@ -61,14 +61,20 @@ export class CekatCRMTrigger implements INodeType {
 	webhookMethods = {
 		default: {
 			async checkExists(this: IHookFunctions): Promise<boolean> {
+				const webhookUrl = this.getNodeWebhookUrl('default');
+				const boardId = this.getNodeParameter('board_id', '') as string;
 				const res = await cekatApiRequest.call(
 					this as any,
 					'GET',
 					'/business_workflows/webhooks',
 					{},
+					{ webhookUrl, boardId },
 					'server',
 				);
-				return Array.isArray(res) && res.length > 0;
+				return (
+					Array.isArray(res) &&
+					res.some((w: any) => w.webhookUrl === webhookUrl && (!boardId || w.boardId === boardId))
+				);
 			},
 
 			async create(this: IHookFunctions): Promise<boolean> {
@@ -79,9 +85,11 @@ export class CekatCRMTrigger implements INodeType {
 				const payload: any = {
 					name: 'N8N CRM Webhook',
 					webhookUrl: webhookUrl,
+
 					events: events,
 				};
 
+				console.log(payload);
 				// Hanya tambahkan board_id jika ada value
 				if (boardId) {
 					payload.boardId = boardId;
@@ -95,21 +103,20 @@ export class CekatCRMTrigger implements INodeType {
 					{},
 					'server',
 				);
+
 				return true;
 			},
 
 			async delete(this: IHookFunctions): Promise<boolean> {
 				const webhookUrl = this.getNodeWebhookUrl('default');
-
-				// First get webhook ID
 				await cekatApiRequest.call(
 					this as any,
 					'POST',
 					'/business_workflows/webhooks/unsubscribe',
 					{ webhookUrl },
+					{},
 					'server',
 				);
-
 				return true;
 			},
 		},
